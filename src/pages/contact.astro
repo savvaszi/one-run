@@ -1,0 +1,19 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import ContactForm from '../components/ContactForm.astro';
+---
+
+<Base title="Contact — One Run" description="Get in touch with One Run — marathon travel experiences.">
+  <Nav />
+  <section style="padding:160px 48px 80px;max-width:600px;margin:0 auto;">
+    <div class="section-tag">Get in touch</div>
+    <h2 class="section-title" style="margin-bottom:12px;">Contact <em>us</em></h2>
+    <p style="font-size:15px;line-height:1.7;color:rgba(243,239,232,0.55);margin-bottom:36px;">Questions about a race, a booking, or anything else? We'll get back to you within 24 hours.</p>
+    <div style="background:rgba(243,239,232,0.02);border:1px solid var(--border);padding:32px;">
+      <ContactForm />
+    </div>
+  </section>
+  <Footer />
+</Base>
