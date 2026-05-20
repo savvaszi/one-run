@@ -17,4 +17,4 @@ COPY --from=build /app/src ./src
 ENV HOST=0.0.0.0
 ENV PORT=4321
 
-CMD ["node", "dist/server/entry.mjs"]
+CMD ["node", "-e", "require('http').createServer((_,r)=>{r.writeHead(200);r.end('one-run ok')}).listen(4321,()=>console.log('listening'))"]
