@@ -1,6 +1,6 @@
 ---
 import StatusPill from './StatusPill.astro';
-import { icons } from '../lib/icons';
+import IconSVG from './IconSVG.astro';
 
 interface Props {
   race: {
@@ -30,10 +30,13 @@ const statusCfg: Record<string, { btnLabel: string; btnClass: string }> = {
 const cfg = statusCfg[race.status] || { btnLabel: 'Express interest', btnClass: 'disabled' };
 const isBookable = race.status === 'open';
 const btnHref = isBookable ? `/races/${race.id}` : '#';
+const escRaceName = race.name.replace(/'/g, "\\'");
 ---
 
 <article class="race-card" data-race-id={race.id}>
-  <div class="race-icon">{@html icons[race.icon] || ''}</div>
+  <div class="race-icon">
+    <IconSVG name={race.icon} />
+  </div>
   <div class="race-city">{race.city}</div>
   <h3 class="race-name">{race.name}</h3>
   <div class="race-info">
@@ -45,8 +48,8 @@ const btnHref = isBookable ? `/races/${race.id}` : '#';
     <StatusPill status={race.status} />
   </div>
   {isBookable ? (
-    <a href={btnHref} class={`race-btn ${cfg.btnClass}`}>{cfg.btnLabel}</a>
+    <a href={btnHref} class="race-btn">{cfg.btnLabel}</a>
   ) : (
-    <button class={`race-btn ${cfg.btnClass}`} onclick={`openInterest('${race.name.replace(/'/g, "\\'")}')`}>{cfg.btnLabel}</button>
+    <button class={`race-btn ${cfg.btnClass}`} onclick={`openInterest('${escRaceName}')`}>{cfg.btnLabel}</button>
   )}
 </article>

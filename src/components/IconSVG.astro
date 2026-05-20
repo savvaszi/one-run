@@ -1,0 +1,8 @@
+---
+import { icons } from '../lib/icons';
+
+const { name } = Astro.props as { name: string };
+const svg = icons[name] || '';
+---
+
+<span class="icon-wrapper" set:html={svg}></span>
