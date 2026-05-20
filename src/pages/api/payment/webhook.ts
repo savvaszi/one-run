@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { db } from '../../../db/index';
 import { bookings } from '../../../db/schema';
 import { eq } from 'drizzle-orm';
+import { sendBookingConfirmation } from '../../../lib/resend';
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -26,6 +27,8 @@ export const POST: APIRoute = async ({ request }) => {
       status: 'paid',
       updated_at: new Date().toISOString()
     }).where(eq(bookings.id, booking.id));
+
+    await sendBookingConfirmation(booking.id).catch(e => console.error('Email send failed:', e));
 
     console.log('Booking paid via webhook:', booking.id);
     return new Response('OK', { status: 200 });

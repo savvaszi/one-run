@@ -3,6 +3,7 @@ import { db } from '../../db/index';
 import { bookings, runners, hotels } from '../../db/schema';
 import { eq } from 'drizzle-orm';
 import { getSetting } from '../../lib/settings';
+import { sendBookingConfirmation } from '../../lib/resend';
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -68,6 +69,8 @@ export const POST: APIRoute = async ({ request }) => {
         status: 'paid',
         updated_at: new Date().toISOString()
       }).where(eq(bookings.id, result.bookingId));
+
+      await sendBookingConfirmation(result.bookingId).catch(e => console.error('Email send failed:', e));
 
       return new Response(JSON.stringify({
         booking_id: result.bookingId,
