@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { directusCreateItem, directusGetItem, directusUpdateItem, type DirectusHotel, type DirectusPackage, type DirectusRace } from '../../lib/directus';
 import { createCancellationToken, hashCancellationToken } from '../../lib/bookingTokens';
-import { sendBookingConfirmationEmail } from '../../lib/bookingEmails';
+import { sendAdminNotificationEmail, sendBookingConfirmationEmail } from '../../lib/bookingEmails';
 
 export const prerender = false;
 
@@ -76,6 +76,13 @@ export const POST: APIRoute = async ({ request }) => {
         runnerEmails: runnerData.map((runner: any) => runner.email),
         cancellationUrl,
       }).catch(e => console.error('Email send failed:', e));
+
+      await sendAdminNotificationEmail({
+        bookingRef,
+        raceName: race.name,
+        packageLabel: selectedPackage.label,
+        totalAmount: selectedPackage.price,
+      }).catch(e => console.error('Admin email send failed:', e));
 
       return new Response(JSON.stringify({
         booking_id: bookingRef,

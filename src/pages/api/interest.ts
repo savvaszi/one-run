@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { directusCreateItem } from '../../lib/directus';
+import { sendInterestAcknowledgement } from '../../lib/bookingEmails';
 
 export const prerender = false;
 
@@ -19,6 +20,8 @@ export const POST: APIRoute = async ({ request }) => {
       email,
       phone: phone || '',
     });
+
+    await sendInterestAcknowledgement(email, race_name).catch(e => console.error('Interest email failed:', e));
 
     return new Response(JSON.stringify({ ok: true }), { status: 200 });
   } catch (e) {

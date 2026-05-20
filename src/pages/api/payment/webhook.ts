@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { directusGetItem, directusGetItems, directusUpdateItem, type DirectusBooking, type DirectusPackage, type DirectusRace, type DirectusRunner } from '../../../lib/directus';
-import { sendBookingConfirmationEmail } from '../../../lib/bookingEmails';
+import { sendAdminNotificationEmail, sendBookingConfirmationEmail } from '../../../lib/bookingEmails';
 
 export const prerender = false;
 
@@ -40,6 +40,13 @@ export const POST: APIRoute = async ({ request }) => {
       runnerEmails: bookingRunners.map((runner) => runner.email),
       cancellationUrl: `${process.env.PUBLIC_SITE_URL || 'https://one-run.net'}/cancel/${booking.reference}`,
     }).catch(e => console.error('Email send failed:', e));
+
+    await sendAdminNotificationEmail({
+      bookingRef: booking.reference,
+      raceName: race.name,
+      packageLabel: selectedPackage.label,
+      totalAmount: booking.total_amount,
+    }).catch(e => console.error('Admin email send failed:', e));
 
     console.log('Booking paid via webhook:', booking.reference);
     return new Response('OK', { status: 200 });

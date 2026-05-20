@@ -17,7 +17,7 @@
     "@libsql/client": "^0.15.0",
     "astro": "^5.7.0",
     "drizzle-orm": "^0.44.0",
-    "resend": "^4.2.0"
+    "nodemailer": "^8.0.7"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
