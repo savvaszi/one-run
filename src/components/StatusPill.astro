@@ -1,0 +1,11 @@
+---
+interface Props { status: string }
+const { status } = Astro.props;
+const statusConfig: Record<string, { label: string; class: string }> = {
+  open: { label: 'Open for registration', class: 'open' },
+  soldout: { label: 'Sold out', class: 'soldout' },
+  express: { label: 'Express interest', class: 'express' },
+};
+const cfg = statusConfig[status] || { label: status, class: '' };
+---
+<span class="status-pill {cfg.class}">{cfg.label}</span>
