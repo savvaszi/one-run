@@ -1,0 +1,42 @@
+---
+import Base from '../../layouts/Base.astro';
+import Logo from '../../components/Logo.astro';
+import { db } from '../../db/index';
+import { bookings, races, hotels } from '../../db/schema';
+import { eq } from 'drizzle-orm';
+
+export const prerender = false;
+
+const { ref } = Astro.params;
+const booking = await db.select().from(bookings).where(eq(bookings.id, ref!)).get();
+
+if (!booking) return Astro.redirect('/');
+
+const race = await db.select().from(races).where(eq(races.id, booking.race_id)).get();
+const hotel = await db.select().from(hotels).where(eq(hotels.id, booking.hotel_id)).get();
+const pkgLabel = booking.package_type === 'single' ? 'Single Room & 1 Race Entry' : 'Twin / Double Room & 2 Race Entries';
+---
+
+<Base title="Booking Confirmed — One Run">
+  <div class="confirm-page active">
+    <div class="confirm-content">
+      <div class="confirm-icon">&check;</div>
+      <h2 class="confirm-title">Thank <em>you</em>.</h2>
+      <p class="confirm-text">Your payment has been received and your booking is confirmed.<br />A confirmation email is on its way to your inbox.</p>
+
+      <div class="confirm-details">
+        <div class="confirm-row"><span class="l">Race</span><span class="v">{race?.name || 'N/A'}</span></div>
+        <div class="confirm-row">
+          <span class="l">Package</span>
+          <span class="v">{pkgLabel}<br /><span style="font-size:11px;color:var(--mute);">{hotel?.name || 'N/A'}</span></span>
+        </div>
+        <div class="confirm-row"><span class="l">Booking ref</span><span class="v">{booking.id}</span></div>
+        <div class="confirm-row total"><span class="l">Paid</span><span class="v">&euro;{booking.total_amount.toLocaleString()}</span></div>
+      </div>
+
+      <p class="confirm-next"><strong>Next steps:</strong> Within 2&ndash;4 business days you'll receive full registration details &mdash; race bib confirmation, hotel voucher, transfer instructions and a personal contact for your trip.</p>
+
+      <a href="/" class="btn-primary" style="margin-top:32px;">Back to home</a>
+    </div>
+  </div>
+</Base>
