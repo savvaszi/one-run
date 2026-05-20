@@ -1,0 +1,49 @@
+---
+const props = Astro.props as { index: number; totalRunners: number };
+const { index, totalRunners } = props;
+const i = index - 1;
+---
+
+<div class="runner-form">
+  <div class="runner-form-title">
+    <span class="runner-num">{index}</span>
+    {totalRunners === 1 ? 'Runner registration' : `Runner ${index} — registration`}
+  </div>
+  <div class="form-grid">
+    <div class="form-group full">
+      <label class="form-label">Full name</label>
+      <input type="text" class="form-input" name={`full_name_${i}`} placeholder="As shown on passport / ID" required />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input type="email" class="form-input" name={`email_${i}`} required />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Telephone number</label>
+      <input type="tel" class="form-input" name={`phone_${i}`} placeholder="+30 ..." required />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Nationality</label>
+      <input type="text" class="form-input" name={`nationality_${i}`} required />
+    </div>
+    <div class="form-group">
+      <label class="form-label">ID or passport number</label>
+      <input type="text" class="form-input" name={`passport_id_${i}`} required />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Expected race completion time</label>
+      <input type="text" class="form-input" name={`expected_time_${i}`} placeholder="e.g. 3:45:20" required />
+    </div>
+    <div class="form-group">
+      <label class="form-label optional">Previous race certificate</label>
+      <label class="form-file">
+        <input type="file" name={`certificate_${i}`} accept=".pdf,.jpg,.jpeg,.png" />
+        <span>📎 Attach file (PDF, JPG, PNG)</span>
+      </label>
+    </div>
+    <div class="form-group full">
+      <label class="form-label optional">Special requirements</label>
+      <textarea class="form-input form-textarea" name={`requirements_${i}`} rows={3} placeholder="Dietary, accessibility, medical, kit pickup preferences..."></textarea>
+    </div>
+  </div>
+</div>

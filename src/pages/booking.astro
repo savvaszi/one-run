@@ -1,0 +1,132 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Logo from '../components/Logo.astro';
+import ProgressBar from '../components/ProgressBar.astro';
+import RunnerForm from '../components/RunnerForm.astro';
+import { db } from '../db/index';
+import { races as racesTable, hotels as hotelsTable } from '../db/schema';
+import { eq } from 'drizzle-orm';
+
+export const prerender = false;
+
+const url = new URL(Astro.request.url);
+const raceId = url.searchParams.get('race_id');
+const hotelId = url.searchParams.get('hotel_id');
+const packageType = url.searchParams.get('package_type') || 'single';
+
+if (!raceId || !hotelId) return Astro.redirect('/');
+
+const race = await db.select().from(racesTable).where(eq(racesTable.id, raceId)).get();
+const hotel = await db.select().from(hotelsTable).where(eq(hotelsTable.id, hotelId)).get();
+if (!race || !hotel) return Astro.redirect('/');
+
+const runnerCount = packageType === 'twin' ? 2 : 1;
+const totalPrice = packageType === 'twin' ? hotel.twin_price : hotel.single_price;
+const pkgLabel = packageType === 'single' ? 'Single Room & 1 Race Entry' : 'Twin / Double Room & 2 Race Entries';
+---
+
+<Base title={`Book ${race.name} — One Run`}>
+  <Nav />
+
+  <div class="booking-page active">
+    <nav>
+      <a href={`/races/${raceId}`} class="detail-back"><span class="detail-back-arrow"></span>Back</a>
+      <Logo />
+      <span></span>
+    </nav>
+
+    <ProgressBar currentStep={2} />
+
+    <div class="booking-body">
+      <div class="booking-summary">
+        <div>
+          <div class="summary-race-city">{race.city}</div>
+          <div class="summary-race-name">{race.name}</div>
+        </div>
+        <div class="summary-pkg">
+          Selected package
+          <strong id="bPkg">{pkgLabel}<br /><span style="font-size:13px;color:var(--mute);font-weight:400;">{hotel.name}</span></strong>
+        </div>
+      </div>
+
+      <form id="bookingForm">
+        {Array.from({ length: runnerCount }, (_, idx) => (
+          <RunnerForm index={idx + 1} totalRunners={runnerCount} />
+        ))}
+
+        <div class="payment-section">
+          <h3>Payment</h3>
+          <div class="payment-method">
+            <div class="payment-icon">R</div>
+            <div>
+              <div class="payment-info-l">Secure payment via</div>
+              <div class="payment-info-v">Revolut Business · Card / Apple Pay / Google Pay</div>
+            </div>
+          </div>
+
+          <div class="total-row">
+            <div class="total-l">Total to pay</div>
+            <div class="total-v">&euro;{totalPrice.toLocaleString()}</div>
+          </div>
+
+          <button type="submit" class="pay-btn">Confirm &amp; pay</button>
+          <p class="legal-note">By confirming, you agree to our <a href="/terms">Terms</a>, <a href="/privacy">Privacy Policy</a>, and <a href="/cancellation">Cancellation policy</a>.</p>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const raceId = '{raceId}';
+    const hotelId = '{hotelId}';
+    const packageType = '{packageType}';
+    const runnerCount = {runnerCount};
+
+    document.getElementById('bookingForm')!.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target as HTMLFormElement;
+      const formData = new FormData(form);
+      const runners: any[] = [];
+
+      for (let i = 0; i < runnerCount; i++) {
+        runners.push({
+          full_name: formData.get(`full_name_${i}`),
+          email: formData.get(`email_${i}`),
+          phone: formData.get(`phone_${i}`),
+          nationality: formData.get(`nationality_${i}`),
+          passport_id: formData.get(`passport_id_${i}`),
+          expected_time: formData.get(`expected_time_${i}`),
+          requirements: formData.get(`requirements_${i}`) || null,
+        });
+      }
+
+      const btn = form.querySelector('.pay-btn') as HTMLButtonElement;
+      btn.textContent = 'Processing...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/book', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ race_id: raceId, hotel_id: hotelId, package_type: packageType, runners }),
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          alert(err.error || 'Booking failed. Please try again.');
+          btn.textContent = 'Confirm & pay';
+          btn.disabled = false;
+          return;
+        }
+
+        const { redirect_url } = await res.json();
+        window.location.href = redirect_url;
+      } catch (err) {
+        alert('Network error. Please try again.');
+        btn.textContent = 'Confirm & pay';
+        btn.disabled = false;
+      }
+    });
+  </script>
+</Base>

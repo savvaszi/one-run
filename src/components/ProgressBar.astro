@@ -1,0 +1,20 @@
+---
+const { currentStep } = Astro.props as { currentStep: number };
+const steps = [
+  { num: 1, label: 'Package', state: currentStep > 1 ? 'done' : currentStep === 1 ? 'active' : '' },
+  { num: 2, label: 'Runner details', state: currentStep > 2 ? 'done' : currentStep === 2 ? 'active' : '' },
+  { num: 3, label: 'Payment', state: currentStep > 3 ? 'done' : currentStep === 3 ? 'active' : '' },
+];
+---
+
+<div class="booking-progress">
+  {steps.map((s, i) => (
+    <>
+      {i > 0 && <div class="progress-divider"></div>}
+      <div class={`progress-step ${s.state}`}>
+        <span class="progress-num">{s.state === 'done' ? '✓' : s.num}</span>
+        {s.label}
+      </div>
+    </>
+  ))}
+</div>
