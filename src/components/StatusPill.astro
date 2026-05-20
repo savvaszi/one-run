@@ -8,4 +8,4 @@ const statusConfig: Record<string, { label: string; class: string }> = {
 };
 const cfg = statusConfig[status] || { label: status, class: '' };
 ---
-<span class="status-pill {cfg.class}">{cfg.label}</span>
+<span class={`status-pill ${cfg.class}`}>{cfg.label}</span>
