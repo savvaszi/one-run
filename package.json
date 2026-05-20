@@ -1,0 +1,22 @@
+{
+  "name": "one-run",
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "start": "node dist/server/entry.mjs"
+  },
+  "dependencies": {
+    "@astrojs/node": "^9.2.0",
+    "astro": "^5.7.0",
+    "drizzle-orm": "^0.44.0",
+    "@libsql/client": "^0.15.0",
+    "resend": "^4.2.0"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.31.0",
+    "@types/node": "^22.0.0"
+  }
+}

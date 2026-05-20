@@ -1,0 +1,6 @@
+node_modules/
+dist/
+data/onerun.db
+drizzle/
+src/data/uploads/
+.env

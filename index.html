@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>One Run — Marathon Travel Experiences</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#000;--fg:#f3efe8;--mute:#8a8680;--dim:#4a4744;--accent:#c9a86a;--card:#0b0b0b;--border:rgba(243,239,232,0.08);--green:#2da94f;--red:#d9453f;--orange:#e8893f}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font-family:'DM Sans',sans-serif;font-weight:300;overflow-x:hidden;line-height:1.5}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:22px 48px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(to bottom,rgba(0,0,0,0.92),transparent)}
+.logo{position:relative;line-height:1;cursor:pointer}
+.logo-one{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:36px;letter-spacing:-1px;color:var(--fg)}
+.logo-run{font-family:'Cormorant Garamond',serif;font-weight:400;font-size:22px;color:rgba(243,239,232,0.55);position:absolute;left:42px;top:28px}
+.nav-links{display:flex;gap:36px;list-style:none}
+.nav-links a{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:rgba(243,239,232,0.55);transition:color 0.3s}
+.nav-links a:hover{color:var(--accent)}
+.nav-right{display:flex;align-items:center;gap:20px}
+.lang{font-size:11px;letter-spacing:1.5px;color:var(--mute);cursor:pointer}
+.nav-cta{padding:10px 22px;background:var(--fg);color:var(--bg);font-size:11px;font-weight:500;letter-spacing:1.8px;text-transform:uppercase;border:none;cursor:pointer;transition:all 0.25s}
+.nav-cta:hover{background:var(--accent)}
+.hero{min-height:100vh;display:grid;grid-template-columns:0.85fr 1.15fr;align-items:center;position:relative;padding:120px 48px 80px;gap:0}
+.hero-content{padding-left:20px;animation:fadeUp 1.1s cubic-bezier(0.16,1,0.3,1)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.hero-tag{display:flex;align-items:center;gap:12px;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:24px}
+.hero-tag::before{content:'';width:32px;height:1px;background:var(--accent)}
+.hero-h1{font-family:'Cormorant Garamond',serif;font-size:clamp(56px,6.5vw,92px);font-weight:500;line-height:1.02;letter-spacing:-1px;margin-bottom:28px;color:var(--fg)}
+.hero-h1 em{font-style:italic;font-weight:400;color:var(--accent)}
+.hero-sub{font-size:16px;line-height:1.7;color:rgba(243,239,232,0.55);max-width:460px;margin-bottom:36px}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap}
+.btn-primary{padding:15px 32px;background:var(--fg);color:var(--bg);font-size:12px;font-weight:500;letter-spacing:2px;text-transform:uppercase;border:none;cursor:pointer;transition:all 0.3s}
+.btn-primary:hover{background:var(--accent)}
+.btn-ghost{padding:15px 32px;background:transparent;color:var(--fg);font-size:12px;letter-spacing:2px;text-transform:uppercase;border:1px solid rgba(243,239,232,0.25);cursor:pointer;transition:all 0.3s}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+.hero-stats{display:flex;gap:48px;margin-top:56px;padding-top:28px;border-top:1px solid var(--border)}
+.stat-n{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:500;letter-spacing:-0.5px;color:var(--fg);line-height:1}
+.stat-l{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--mute);margin-top:6px}
+.hero-runner{position:relative;display:flex;justify-content:flex-start;align-items:center;height:100%;margin-left:-40px}
+.hero-runner img{width:115%;max-width:none;object-fit:contain;transform:translateX(-5%)}
+.races{padding:120px 48px 140px;background:var(--bg)}
+.section-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:56px;flex-wrap:wrap;gap:24px}
+.section-tag{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(44px,5vw,68px);font-weight:500;letter-spacing:-1px;line-height:1}
+.section-title em{font-style:italic;color:var(--accent);font-weight:400}
+.filters{display:flex;gap:24px;flex-wrap:wrap;align-items:center;margin-bottom:40px;padding-bottom:24px;border-bottom:1px solid var(--border)}
+.filter-group{display:flex;align-items:center;gap:10px}
+.filter-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--mute)}
+.filter-select{background:transparent;color:var(--fg);border:1px solid var(--border);padding:8px 14px;font-family:inherit;font-size:12px;letter-spacing:0.5px;cursor:pointer;outline:none;transition:border-color 0.3s}
+.filter-select:hover,.filter-select:focus{border-color:var(--accent)}
+.filter-select option{background:var(--card);color:var(--fg)}
+.filter-reset{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute);cursor:pointer;background:none;border:none;transition:color 0.3s;margin-left:auto}
+.filter-reset:hover{color:var(--accent)}
+.races-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1px;background:var(--border)}
+.race-card{background:var(--card);padding:32px 28px 28px;position:relative;transition:background 0.3s,transform 0.3s;display:flex;flex-direction:column;min-height:480px}
+.race-card:hover{background:#121210;transform:translateY(-3px)}
+.race-icon{height:120px;margin-bottom:20px;display:flex;align-items:center;justify-content:center}
+.race-icon svg{width:100%;height:100%}
+.race-city{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.race-name{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;letter-spacing:-0.5px;line-height:1.1;margin-bottom:18px;color:var(--fg)}
+.race-info{font-size:12px;color:rgba(243,239,232,0.6);line-height:2;padding:14px 0;border-top:1px solid var(--border);flex:1}
+.race-info-row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.race-info-label{color:var(--mute);letter-spacing:0.5px}
+.race-info-value{color:var(--fg);font-weight:400}
+.race-status{margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.status-pill{display:inline-flex;align-items:center;gap:8px;font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;padding:7px 14px;border-radius:999px;color:#fff}
+.status-pill.open{background:var(--green)}
+.status-pill.soldout{background:var(--red)}
+.status-pill.express{background:var(--orange)}
+.status-pill::before{content:'';width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.85)}
+.race-btn{width:100%;margin-top:14px;padding:13px;background:var(--fg);color:var(--bg);font-size:11px;font-weight:500;letter-spacing:2px;text-transform:uppercase;border:none;cursor:pointer;transition:all 0.25s}
+.race-btn:hover{background:var(--accent)}
+.race-btn.express-btn{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+.race-btn.express-btn:hover{background:var(--accent);color:var(--bg)}
+.race-btn.disabled{background:var(--dim);color:var(--mute);cursor:not-allowed}
+.detail-page{display:none;position:fixed;inset:0;z-index:200;background:var(--bg);overflow-y:auto}
+.detail-page.active{display:block}
+.detail-nav{position:sticky;top:0;z-index:10;background:rgba(0,0,0,0.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:18px 48px;display:flex;align-items:center;justify-content:space-between}
+.detail-back{display:flex;align-items:center;gap:10px;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--mute);cursor:pointer;background:none;border:none;transition:color 0.3s}
+.detail-back:hover{color:var(--accent)}
+.detail-back-arrow{width:24px;height:1px;background:currentColor;position:relative}
+.detail-back-arrow::before{content:'';position:absolute;left:0;top:-3px;width:8px;height:8px;border-left:1px solid currentColor;border-bottom:1px solid currentColor;transform:rotate(45deg)}
+.detail-compact{padding:32px 48px 48px;display:grid;grid-template-columns:1fr 1.1fr;gap:48px;min-height:calc(100vh - 64px)}
+.detail-left{display:flex;flex-direction:column;gap:24px;min-height:0}
+.detail-header .race-city{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.detail-header h1{font-family:'Cormorant Garamond',serif;font-size:clamp(44px,4.5vw,60px);font-weight:500;line-height:1;letter-spacing:-1px;margin-bottom:0}
+.detail-meta-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;padding:18px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.meta-item .meta-l{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute);margin-bottom:4px}
+.meta-item .meta-v{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:500}
+.detail-photos-stack{display:flex;flex-direction:column;gap:10px;flex-shrink:0}
+.gallery-photo{width:100%;height:240px;background:linear-gradient(135deg,#1a1a1a,#0a0a0a);border:1px solid var(--border);position:relative;display:flex;align-items:center;justify-content:center;color:var(--mute);font-size:11px;letter-spacing:2px;text-transform:uppercase;overflow:hidden;transition:border-color 0.3s}
+.gallery-photo:hover{border-color:rgba(201,168,106,0.4)}
+.gallery-photo::after{content:'📷';position:absolute;font-size:36px;opacity:0.12}
+.gallery-photo span{position:relative;z-index:1;text-align:center;padding:8px}
+.gallery-photo.icon-photo{background:rgba(243,239,232,0.02);padding:32px;height:280px}
+.gallery-photo.icon-photo svg{width:100%;height:100%}
+.detail-info-row{display:grid;grid-template-columns:1.5fr 1fr;gap:24px;flex-shrink:0}
+.detail-desc-compact p{font-size:14px;line-height:1.7;color:rgba(243,239,232,0.65)}
+.detail-included-compact{background:rgba(243,239,232,0.02);padding:18px 22px;border:1px solid var(--border)}
+.detail-included-compact h3{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.included-list-compact{list-style:none;display:grid;grid-template-columns:1fr;gap:0}
+.included-list-compact li{font-size:12px;padding:6px 0;border-bottom:1px solid rgba(243,239,232,0.04);color:rgba(243,239,232,0.7);display:flex;gap:8px;align-items:flex-start}
+.included-list-compact li::before{content:'✓';color:var(--accent);font-size:11px}
+.included-list-compact li:last-child{border-bottom:none}
+.detail-right{display:flex;flex-direction:column;gap:18px;min-height:0}
+.detail-right-header{flex-shrink:0}
+.detail-right-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:500;letter-spacing:-0.5px;margin:0}
+.detail-right-title em{font-style:italic;color:var(--accent)}
+.hotels-grid-compact{display:flex;flex-direction:column;gap:10px;flex-shrink:0}
+.hotel-card-compact{background:rgba(243,239,232,0.02);border:1px solid var(--border);padding:0;cursor:pointer;transition:all 0.25s;display:grid;grid-template-columns:130px 1fr;gap:0;overflow:hidden;position:relative}
+.hotel-card-compact:hover{border-color:var(--accent);background:rgba(201,168,106,0.04)}
+.hotel-card-compact.selected{border-color:var(--accent);background:rgba(201,168,106,0.08)}
+.hc-photo{background:linear-gradient(135deg,#222,#0a0a0a);position:relative;display:flex;align-items:center;justify-content:center;color:var(--mute);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;min-height:110px}
+.hc-photo::after{content:'📷';position:absolute;font-size:24px;opacity:0.2}
+.hc-photo span{position:relative;z-index:1;text-align:center;padding:8px}
+.hc-content{padding:16px 20px;display:flex;flex-direction:column;justify-content:center}
+.hc-name-row{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+.hc-name{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;letter-spacing:-0.3px;line-height:1.1}
+.hc-stars{color:var(--accent);font-size:12px;letter-spacing:1px}
+.hc-area{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute);margin-bottom:6px}
+.hc-features{font-size:12px;color:rgba(243,239,232,0.6);line-height:1.5}
+.hc-website-link{position:absolute;top:8px;right:10px;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);background:rgba(0,0,0,0.55);padding:4px 10px;border:1px solid rgba(201,168,106,0.4);transition:all 0.25s;text-decoration:none;z-index:2}
+.hc-website-link:hover{background:var(--accent);color:var(--bg)}
+.occupancy-section{flex-shrink:0}
+.occupancy-select{width:100%;background:var(--card);color:var(--fg);border:1px solid var(--border);padding:14px 16px;font-family:inherit;font-size:13px;cursor:pointer;outline:none;transition:border-color 0.3s;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' stroke='%23c9a86a' stroke-width='1.5' fill='none'/></svg>");background-repeat:no-repeat;background-position:right 16px center;padding-right:40px}
+.occupancy-select:hover:not(:disabled),.occupancy-select:focus{border-color:var(--accent)}
+.occupancy-select:disabled{opacity:0.5;cursor:not-allowed}
+.occupancy-select option{background:var(--card);color:var(--fg);padding:10px}
+.continue-bar-compact{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:14px;padding-top:16px;border-top:1px solid var(--border)}
+.continue-info-compact{font-size:13px;color:var(--mute);flex:1;line-height:1.5}
+.continue-info-compact strong{color:var(--fg);font-weight:500}
+.detail-hero{padding:80px 48px 60px;display:grid;grid-template-columns:1.3fr 1fr;gap:60px;align-items:center;border-bottom:1px solid var(--border)}
+.detail-hero-content .race-city{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.detail-hero-content h1{font-family:'Cormorant Garamond',serif;font-size:clamp(48px,6vw,78px);font-weight:500;line-height:1;letter-spacing:-1.5px;margin-bottom:24px}
+.detail-meta{display:flex;gap:40px;flex-wrap:wrap;margin-top:24px;padding-top:24px;border-top:1px solid var(--border)}
+.detail-meta-item .l{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--mute);margin-bottom:6px}
+.detail-meta-item .v{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500}
+.detail-hero-icon{background:rgba(243,239,232,0.02);padding:40px;height:320px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border)}
+.detail-hero-icon svg{width:100%;height:100%}
+.detail-photos{padding:60px 48px;display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px;max-height:480px}
+.detail-photo{background:linear-gradient(135deg,#1a1a1a,#0a0a0a);border:1px solid var(--border);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;color:var(--mute);font-size:11px;letter-spacing:2px;text-transform:uppercase;min-height:220px}
+.detail-photo:nth-child(1){grid-row:span 2;min-height:460px}
+.detail-photo::after{content:'';position:absolute;font-size:32px;opacity:0.15}
+.detail-body{padding:60px 48px;display:grid;grid-template-columns:1.5fr 1fr;gap:80px;border-top:1px solid var(--border)}
+.detail-desc h2{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:500;margin-bottom:24px;letter-spacing:-0.5px}
+.detail-desc p{font-size:15px;line-height:1.85;color:rgba(243,239,232,0.65);margin-bottom:16px}
+.detail-included{background:rgba(243,239,232,0.02);padding:32px;border:1px solid var(--border)}
+.detail-included h3{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:20px}
+.included-list{list-style:none}
+.included-list li{font-size:13px;padding:10px 0;border-bottom:1px solid var(--border);color:rgba(243,239,232,0.7);display:flex;align-items:flex-start;gap:10px}
+.included-list li::before{content:'✓';color:var(--accent);flex-shrink:0}
+.included-list li:last-child{border-bottom:none}
+.detail-packages{padding:60px 48px 0;border-top:1px solid var(--border)}
+.detail-packages h2{font-family:'Cormorant Garamond',serif;font-size:44px;font-weight:500;letter-spacing:-1px;margin-bottom:48px}
+.detail-packages h2 em{font-style:italic;color:var(--accent)}
+.package-tabs{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-bottom:32px;border:1px solid var(--border)}
+.pkg-tab{background:transparent;color:var(--mute);padding:18px 24px;border:none;cursor:pointer;text-align:left;transition:all 0.25s;border-right:1px solid var(--border);font-family:inherit}
+.pkg-tab:last-child{border-right:none}
+.pkg-tab:hover{background:rgba(243,239,232,0.02);color:var(--fg)}
+.pkg-tab.active{background:rgba(201,168,106,0.08);color:var(--fg);border-bottom:2px solid var(--accent)}
+.pkg-tab-l{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.pkg-tab-v{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500}
+.hotel-intro{font-size:13px;color:rgba(243,239,232,0.55);margin-bottom:28px;line-height:1.7;max-width:680px}
+.hotels-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:40px}
+.hotel-card{background:rgba(243,239,232,0.02);border:1px solid var(--border);padding:0;cursor:pointer;transition:all 0.3s;position:relative;display:flex;flex-direction:column;overflow:hidden}
+.hotel-card:hover{border-color:var(--accent);background:rgba(201,168,106,0.04)}
+.hotel-card.selected{border-color:var(--accent);background:rgba(201,168,106,0.07)}
+.hotel-card.selected::before{content:'✓ Selected';position:absolute;top:14px;right:14px;font-size:10px;letter-spacing:1.5px;color:var(--accent);background:rgba(0,0,0,0.6);padding:4px 10px;z-index:2}
+.hotel-photo{height:160px;background:linear-gradient(135deg,#1a1a1a,#0a0a0a);position:relative;display:flex;align-items:center;justify-content:center;color:var(--mute);font-size:11px;letter-spacing:2px;text-transform:uppercase}
+.hotel-photo::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0) 50%,rgba(0,0,0,0.6))}
+.hotel-stars{position:absolute;bottom:12px;left:14px;display:flex;gap:2px;z-index:1;color:var(--accent);font-size:13px;letter-spacing:2px}
+.hotel-body{padding:20px 22px 22px;display:flex;flex-direction:column;flex:1}
+.hotel-name{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;letter-spacing:-0.3px;margin-bottom:4px;line-height:1.2}
+.hotel-area{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+.hotel-features{list-style:none;font-size:12px;line-height:1.8;color:rgba(243,239,232,0.6);margin-bottom:16px;flex:1}
+.hotel-features li{padding:3px 0;display:flex;gap:8px;align-items:flex-start}
+.hotel-features li::before{content:'—';color:var(--accent);flex-shrink:0}
+.hotel-price-row{padding-top:14px;border-top:1px solid var(--border);display:flex;align-items:baseline;justify-content:space-between}
+.hotel-price{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:500;color:var(--fg)}
+.hotel-price-l{font-size:10px;color:var(--mute);letter-spacing:1px;text-transform:uppercase}
+.package-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:40px}
+.package-card{background:rgba(243,239,232,0.02);border:1px solid var(--border);padding:36px 32px;cursor:pointer;transition:all 0.3s;position:relative;display:flex;flex-direction:column}
+.package-card:hover,.package-card.selected{border-color:var(--accent);background:rgba(201,168,106,0.05)}
+.package-card.selected::before{content:'✓ Selected';position:absolute;top:14px;right:14px;font-size:10px;letter-spacing:1.5px;color:var(--accent)}
+.pkg-tag{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.pkg-name{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;letter-spacing:-0.5px;margin-bottom:18px}
+.pkg-desc{font-size:13px;color:rgba(243,239,232,0.6);line-height:1.7;margin-bottom:24px;min-height:60px}
+.pkg-features{list-style:none;margin-bottom:24px;flex:1}
+.pkg-features li{font-size:12px;padding:8px 0;color:rgba(243,239,232,0.7);display:flex;align-items:flex-start;gap:10px;border-bottom:1px solid rgba(243,239,232,0.04)}
+.pkg-features li::before{content:'—';color:var(--accent)}
+.pkg-price-row{padding-top:20px;border-top:1px solid var(--border);display:flex;align-items:baseline;justify-content:space-between}
+.pkg-price{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:500;color:var(--fg)}
+.pkg-price-l{font-size:11px;color:var(--mute);letter-spacing:1px;text-transform:uppercase}
+.continue-bar{position:sticky;bottom:0;background:rgba(0,0,0,0.95);backdrop-filter:blur(12px);border-top:1px solid var(--border);padding:22px 48px;margin-left:-48px;margin-right:-48px;display:flex;align-items:center;justify-content:space-between}
+.continue-info{font-size:13px;color:var(--mute)}
+.continue-info strong{color:var(--fg);font-weight:500}
+.continue-btn{padding:16px 36px;background:var(--accent);color:var(--bg);font-size:12px;font-weight:500;letter-spacing:2px;text-transform:uppercase;border:none;cursor:pointer;transition:all 0.25s}
+.continue-btn:disabled{background:var(--dim);color:var(--mute);cursor:not-allowed}
+.continue-btn:hover:not(:disabled){background:#d8b876}
+.booking-page{display:none;position:fixed;inset:0;z-index:300;background:var(--bg);overflow-y:auto}
+.booking-page.active{display:block}
+.booking-progress{padding:18px 48px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:24px;position:sticky;top:0;background:rgba(0,0,0,0.95);z-index:10;backdrop-filter:blur(10px)}
+.progress-step{display:flex;align-items:center;gap:10px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--mute)}
+.progress-step.active{color:var(--accent)}
+.progress-step.done{color:var(--fg)}
+.progress-num{width:26px;height:26px;border-radius:50%;border:1px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:11px}
+.progress-step.active .progress-num{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.progress-step.done .progress-num{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.progress-divider{width:40px;height:1px;background:var(--border)}
+.booking-body{max-width:880px;margin:0 auto;padding:60px 48px 100px}
+.booking-summary{background:rgba(243,239,232,0.03);border:1px solid var(--border);padding:24px 28px;margin-bottom:40px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.summary-race-city{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+.summary-race-name{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:500}
+.summary-pkg{text-align:right;font-size:13px;color:rgba(243,239,232,0.6)}
+.summary-pkg strong{color:var(--fg);font-weight:500;display:block;margin-top:4px;font-size:16px}
+.runner-form{margin-bottom:32px}
+.runner-form-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:500;display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.runner-num{width:32px;height:32px;border-radius:50%;background:var(--accent);color:var(--bg);font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.form-grid .full{grid-column:1 / -1}
+.form-group{display:flex;flex-direction:column}
+.form-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+.form-label.optional::after{content:' · optional';color:var(--dim);text-transform:none;letter-spacing:0.5px}
+.form-input,.form-textarea{background:transparent;border:1px solid var(--border);color:var(--fg);padding:14px 16px;font-family:inherit;font-size:14px;outline:none;transition:border-color 0.3s}
+.form-input:focus,.form-textarea:focus{border-color:var(--accent)}
+.form-file{display:flex;align-items:center;gap:12px;padding:14px 16px;border:1px dashed var(--border);cursor:pointer;transition:border-color 0.3s;font-size:13px;color:var(--mute)}
+.form-file:hover{border-color:var(--accent);color:var(--accent)}
+.form-file input{display:none}
+.payment-section{border-top:1px solid var(--border);margin-top:40px;padding-top:40px}
+.payment-section h3{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;margin-bottom:20px}
+.payment-method{background:rgba(243,239,232,0.02);border:1px solid var(--border);padding:20px 24px;display:flex;align-items:center;gap:16px;margin-bottom:20px}
+.payment-icon{width:48px;height:48px;background:var(--fg);color:var(--bg);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;letter-spacing:1px;border-radius:8px}
+.payment-info-l{font-size:11px;letter-spacing:2px;color:var(--mute);text-transform:uppercase}
+.payment-info-v{font-size:14px;color:var(--fg);margin-top:4px}
+.total-row{display:flex;align-items:baseline;justify-content:space-between;padding:24px;background:rgba(201,168,106,0.06);border:1px solid rgba(201,168,106,0.25);margin-bottom:28px}
+.total-l{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--accent)}
+.total-v{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:500;color:var(--fg);letter-spacing:-1px}
+.pay-btn{width:100%;padding:20px;background:var(--accent);color:var(--bg);font-size:13px;font-weight:600;letter-spacing:3px;text-transform:uppercase;border:none;cursor:pointer;transition:all 0.25s}
+.pay-btn:hover{background:#d8b876}
+.legal-note{margin-top:16px;font-size:11px;line-height:1.7;color:var(--mute);text-align:center}
+.legal-note a{color:var(--accent)}
+.confirm-page{display:none;position:fixed;inset:0;z-index:400;background:var(--bg);align-items:center;justify-content:center;padding:48px}
+.confirm-page.active{display:flex}
+.confirm-content{max-width:560px;text-align:center}
+.confirm-icon{width:88px;height:88px;border-radius:50%;background:var(--accent);color:var(--bg);margin:0 auto 32px;display:flex;align-items:center;justify-content:center;font-size:38px;animation:pulseIn 0.8s cubic-bezier(0.16,1,0.3,1)}
+@keyframes pulseIn{from{transform:scale(0.4);opacity:0}to{transform:scale(1);opacity:1}}
+.confirm-title{font-family:'Cormorant Garamond',serif;font-size:56px;font-weight:500;letter-spacing:-1.5px;margin-bottom:18px}
+.confirm-title em{font-style:italic;color:var(--accent)}
+.confirm-text{font-size:16px;line-height:1.7;color:rgba(243,239,232,0.65);margin-bottom:32px}
+.confirm-details{background:rgba(243,239,232,0.03);border:1px solid var(--border);padding:24px;text-align:left;margin-bottom:32px}
+.confirm-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px}
+.confirm-row:last-child{border-bottom:none;padding-top:14px}
+.confirm-row .l{color:var(--mute);letter-spacing:0.5px}
+.confirm-row .v{color:var(--fg);font-weight:500}
+.confirm-row.total .v{color:var(--accent);font-size:17px}
+.confirm-next{font-size:13px;color:var(--mute);margin-top:24px}
+.confirm-next strong{color:var(--accent);font-weight:500}
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.88);backdrop-filter:blur(8px);z-index:500;display:none;align-items:center;justify-content:center;padding:24px}
+.modal-backdrop.active{display:flex}
+.modal{background:#0a0a0a;border:1px solid var(--border);max-width:520px;width:100%;padding:40px 44px;position:relative;animation:modalIn 0.35s cubic-bezier(0.16,1,0.3,1)}
+@keyframes modalIn{from{opacity:0;transform:translateY(20px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+.modal-close{position:absolute;top:16px;right:16px;width:36px;height:36px;background:transparent;border:1px solid var(--border);color:var(--fg);font-size:18px;cursor:pointer;transition:all 0.25s;line-height:0}
+.modal-close:hover{border-color:var(--accent);color:var(--accent)}
+.modal-tag{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:500;letter-spacing:-0.5px;margin-bottom:8px}
+.modal-sub{font-size:13px;color:var(--mute);margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.form-submit{width:100%;margin-top:10px;padding:15px;background:var(--accent);color:var(--bg);font-size:11px;font-weight:500;letter-spacing:2px;text-transform:uppercase;border:none;cursor:pointer;transition:background 0.25s}
+.form-submit:hover{background:#d8b876}
+footer{padding:48px;border-top:1px solid var(--border);display:flex;justify-content:space-between;flex-wrap:wrap;gap:24px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute)}
+.footer-links{display:flex;gap:28px}
+.footer-links a:hover{color:var(--accent)}
+@media(max-width:900px){
+nav{padding:18px 24px}
+.nav-links{display:none}
+.hero{grid-template-columns:1fr;padding:100px 24px 60px}
+.hero-content{padding-left:0}
+.hero-runner{height:320px;margin-top:40px;margin-left:0}
+.hero-runner img{width:100%;max-width:500px;transform:none}
+.races{padding:80px 24px 100px}
+.section-header{flex-direction:column;align-items:flex-start}
+.filters{gap:16px}
+.races-grid{grid-template-columns:1fr}
+.detail-compact{grid-template-columns:1fr;height:auto;max-height:none;padding:18px 20px;gap:20px;overflow:visible}
+.detail-left,.detail-right{overflow:visible}
+.detail-photos-compact{height:160px}
+.detail-info-row{grid-template-columns:1fr;gap:14px}
+.detail-meta-strip{grid-template-columns:repeat(2,1fr)}
+.hotels-grid-compact{overflow-y:visible}
+.hotel-card-compact{grid-template-columns:1fr}
+.hc-price,.hc-price-l{text-align:left}
+.continue-bar-compact{flex-direction:column;align-items:stretch;gap:10px}
+.continue-bar-compact .continue-btn{width:100%}
+.form-grid{grid-template-columns:1fr}
+.booking-body{padding:40px 24px 80px}
+footer{padding:32px 24px;flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<div id="homepage">
+<nav>
+<div class="logo" onclick="showHome()"><span class="logo-one">one</span><span class="logo-run">run</span></div>
+<div class="nav-right">
+<span class="lang">EN / ΕΛ</span>
+<button class="nav-cta" onclick="document.getElementById('races').scrollIntoView({behavior:'smooth'})">Book now</button>
+</div>
+</nav>
+
+<section class="hero">
+<div class="hero-content">
+<div class="hero-tag">Marathon Travel Experiences</div>
+<h1 class="hero-h1">Run the world's<br><em>greatest</em> races.</h1>
+<p class="hero-sub">Complete travel packages — race entry, premium hotels, transfers, and expert local knowledge. From Frankfurt to Tokyo.</p>
+<div class="hero-actions">
+<button class="btn-primary" onclick="document.getElementById('races').scrollIntoView({behavior:'smooth'})">Explore races</button>
+<button class="btn-ghost">How it works</button>
+</div>
+<div class="hero-stats">
+<div><div class="stat-n">40+</div><div class="stat-l">Marathons</div></div>
+<div><div class="stat-n">18</div><div class="stat-l">Countries</div></div>
+<div><div class="stat-n">2,400+</div><div class="stat-l">Runners</div></div>
+</div>
+</div>
+<div class="hero-runner"><img src="runner-hero.jpg" alt=""></div>
+</section>
+
+<section class="races" id="races">
+<div class="section-header">
+<div>
+<div class="section-tag">2026 Season</div>
+<h2 class="section-title">Upcoming <em>races</em></h2>
+</div>
+</div>
+
+<div class="filters">
+<div class="filter-group">
+<span class="filter-label">Month</span>
+<select class="filter-select" id="filterMonth" onchange="applyFilters()">
+<option value="all">All months</option>
+<option value="3">March</option><option value="4">April</option>
+<option value="5">May</option><option value="9">September</option>
+<option value="10">October</option><option value="11">November</option>
+<option value="12">December</option>
+</select>
+</div>
+<div class="filter-group">
+<span class="filter-label">Terrain</span>
+<select class="filter-select" id="filterTerrain" onchange="applyFilters()">
+<option value="all">All terrains</option>
+<option value="Flat & fast">Flat & fast</option>
+<option value="Hilly">Hilly</option>
+<option value="Urban">Urban</option>
+</select>
+</div>
+<div class="filter-group">
+<span class="filter-label">Status</span>
+<select class="filter-select" id="filterStatus" onchange="applyFilters()">
+<option value="all">All statuses</option>
+<option value="open">Open for registration</option>
+<option value="express">Express interest</option>
+<option value="soldout">Sold out</option>
+</select>
+</div>
+<button class="filter-reset" onclick="resetFilters()">Reset</button>
+</div>
+
+<div class="races-grid" id="racesGrid"></div>
+</section>
+
+<footer>
+<div>© 2026 One Run · one-run.net</div>
+<div class="footer-links">
+<a href="#">Privacy</a><a href="#">Terms</a>
+<a href="#">Cancellation policy</a><a href="#">Contact</a>
+</div>
+</footer>
+</div>
+
+<div class="detail-page" id="detailPage">
+<div class="detail-nav">
+<button class="detail-back" onclick="showHome()"><span class="detail-back-arrow"></span>Back to races</button>
+<div class="logo" onclick="showHome()"><span class="logo-one">one</span><span class="logo-run">run</span></div>
+</div>
+
+<section class="detail-compact">
+
+<!-- LEFT COLUMN: race info, photo, description, included -->
+<div class="detail-left">
+<div class="detail-header">
+<div class="race-city" id="dCity"></div>
+<h1 id="dName"></h1>
+</div>
+
+<div class="detail-meta-strip">
+<div class="meta-item"><div class="meta-l">Date</div><div class="meta-v" id="dDate"></div></div>
+<div class="meta-item"><div class="meta-l">Distance</div><div class="meta-v">42.195 km</div></div>
+<div class="meta-item"><div class="meta-l">Terrain</div><div class="meta-v" id="dTerrain"></div></div>
+<div class="meta-item"><div class="meta-l">From</div><div class="meta-v" id="dPrice"></div></div>
+</div>
+
+<div class="detail-info-row">
+<div class="detail-desc-compact">
+<p id="dDesc1"></p>
+</div>
+<div class="detail-included-compact">
+<h3>Included</h3>
+<ul class="included-list-compact">
+<li>Race entry & bib</li>
+<li>Hotel (3 nights)</li>
+<li>Transfers</li>
+<li>Welcome dinner</li>
+<li>Race day support</li>
+<li>Local SIM</li>
+</ul>
+</div>
+</div>
+
+<div class="detail-photos-stack" id="dPhotosGallery"></div>
+
+</div>
+
+<!-- RIGHT COLUMN: hotel selection with photos + occupancy dropdown -->
+<div class="detail-right">
+<div class="detail-right-header">
+<div class="section-tag" style="margin-bottom:6px;">Step 1 — choose your hotel</div>
+<h3 class="detail-right-title">Hotels & <em>packages</em></h3>
+</div>
+
+<div class="hotels-grid-compact" id="hotelsGrid"></div>
+
+<div class="detail-right-header" style="margin-top:14px;">
+<div class="section-tag" style="margin-bottom:6px;">Step 2 — choose room & occupancy</div>
+</div>
+
+<div class="occupancy-section">
+<select class="occupancy-select" id="occupancySelect" onchange="selectOccupancy()" disabled>
+<option value="">Pick a hotel first…</option>
+</select>
+</div>
+
+<div class="continue-bar-compact">
+<div class="continue-info-compact" id="continueText">No package selected</div>
+<button class="continue-btn" id="continueBtn" disabled onclick="goToBooking()">Continue →</button>
+</div>
+</div>
+
+</section>
+</div>
+
+<div class="booking-page" id="bookingPage">
+<nav>
+<button class="detail-back" onclick="backToDetail()"><span class="detail-back-arrow"></span>Back</button>
+<div class="logo" onclick="showHome()"><span class="logo-one">one</span><span class="logo-run">run</span></div>
+<span></span>
+</nav>
+
+<div class="booking-progress">
+<div class="progress-step done"><span class="progress-num">✓</span> Package</div>
+<div class="progress-divider"></div>
+<div class="progress-step active"><span class="progress-num">2</span> Runner details</div>
+<div class="progress-divider"></div>
+<div class="progress-step"><span class="progress-num">3</span> Payment</div>
+</div>
+
+<div class="booking-body">
+<div class="booking-summary">
+<div>
+<div class="summary-race-city" id="bCity"></div>
+<div class="summary-race-name" id="bName"></div>
+</div>
+<div class="summary-pkg">Selected package<strong id="bPkg"></strong></div>
+</div>
+
+<form id="bookingForm" onsubmit="processPayment(event)">
+<div id="runnersContainer"></div>
+
+<div class="payment-section">
+<h3>Payment</h3>
+<div class="payment-method">
+<div class="payment-icon">R</div>
+<div>
+<div class="payment-info-l">Secure payment via</div>
+<div class="payment-info-v">Revolut Business · Card / Apple Pay / Google Pay</div>
+</div>
+</div>
+
+<div class="total-row">
+<div class="total-l">Total to pay</div>
+<div class="total-v" id="bTotal">€1,290</div>
+</div>
+
+<button type="submit" class="pay-btn">Confirm & pay</button>
+<p class="legal-note">By confirming, you agree to our <a href="#">Terms</a>, <a href="#">Privacy Policy</a>, and <a href="#">Cancellation policy</a>. You will receive a confirmation email immediately, with full registration details within 2-4 business days.</p>
+</div>
+</form>
+</div>
+</div>
+
+<div class="confirm-page" id="confirmPage">
+<div class="confirm-content">
+<div class="confirm-icon">✓</div>
+<h2 class="confirm-title">Thank <em>you</em>.</h2>
+<p class="confirm-text">Your payment has been received and your booking is confirmed.<br>A confirmation email is on its way to your inbox.</p>
+
+<div class="confirm-details">
+<div class="confirm-row"><span class="l">Race</span><span class="v" id="cRace"></span></div>
+<div class="confirm-row"><span class="l">Package</span><span class="v" id="cPkg"></span></div>
+<div class="confirm-row"><span class="l">Booking ref</span><span class="v" id="cRef"></span></div>
+<div class="confirm-row total"><span class="l">Paid</span><span class="v" id="cTotal"></span></div>
+</div>
+
+<p class="confirm-next"><strong>Next steps:</strong> Within 2–4 business days you'll receive full registration details — race bib confirmation, hotel voucher, transfer instructions and a personal contact for your trip.</p>
+
+<button class="btn-primary" onclick="showHome()" style="margin-top:32px;">Back to home</button>
+</div>
+</div>
+
+<div class="modal-backdrop" id="modalBackdrop">
+<div class="modal">
+<button class="modal-close" onclick="closeModal()">×</button>
+<div id="formView">
+<div class="modal-tag">Express interest</div>
+<h3 class="modal-title" id="modalRaceName">Race Name</h3>
+<p class="modal-sub">Be the first to know when entries open.</p>
+<form onsubmit="submitInterest(event)">
+<div class="form-group" style="margin-bottom:14px;">
+<label class="form-label">Marathon</label>
+<input type="text" class="form-input" id="modalRaceInput" disabled>
+</div>
+<div class="form-grid" style="gap:14px;margin-bottom:14px;">
+<div class="form-group"><label class="form-label">First name</label><input type="text" class="form-input" required></div>
+<div class="form-group"><label class="form-label">Last name</label><input type="text" class="form-input" required></div>
+</div>
+<div class="form-group" style="margin-bottom:14px;"><label class="form-label">Email</label><input type="email" class="form-input" required></div>
+<div class="form-group" style="margin-bottom:14px;"><label class="form-label">Phone</label><input type="tel" class="form-input" required></div>
+<button type="submit" class="form-submit">Submit interest</button>
+</form>
+</div>
+</div>
+</div>
+
+<script>
+const icons={berlin:`<svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg"><g fill="#9e9b94"><rect x="30" y="50" width="10" height="70"/><rect x="54" y="50" width="10" height="70"/><rect x="78" y="50" width="10" height="70"/><rect x="102" y="50" width="10" height="70"/><rect x="126" y="50" width="10" height="70"/><rect x="150" y="50" width="10" height="70"/><rect x="20" y="40" width="150" height="12"/><rect x="30" y="28" width="130" height="14"/><rect x="50" y="14" width="90" height="16"/><rect x="78" y="4" width="5" height="12"/><rect x="88" y="4" width="5" height="12"/><rect x="98" y="4" width="5" height="12"/><rect x="108" y="4" width="5" height="12"/><rect x="73" y="0" width="45" height="6"/></g><rect x="10" y="120" width="180" height="2" fill="#9e9b94"/></svg>`,frankfurt:`<svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg"><g fill="#9e9b94"><rect x="10" y="80" width="20" height="40"/><rect x="34" y="65" width="18" height="55"/><rect x="56" y="30" width="24" height="90"/><rect x="66" y="10" width="4" height="20"/><rect x="84" y="40" width="22" height="80"/><rect x="93" y="32" width="4" height="8"/><rect x="110" y="55" width="18" height="65"/><rect x="132" y="90" width="14" height="30"/><polygon points="132,90 139,78 146,90"/><rect x="150" y="75" width="18" height="45"/><rect x="172" y="85" width="16" height="35"/></g><rect x="5" y="120" width="190" height="2" fill="#9e9b94"/></svg>`,athens:`<svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg"><g fill="#9e9b94"><rect x="30" y="50" width="8" height="60"/><rect x="48" y="50" width="8" height="60"/><rect x="66" y="50" width="8" height="60"/><rect x="84" y="50" width="8" height="60"/><rect x="102" y="50" width="8" height="60"/><rect x="120" y="50" width="8" height="60"/><rect x="138" y="50" width="8" height="60"/><rect x="156" y="50" width="8" height="60"/><rect x="22" y="40" width="150" height="12"/><polygon points="22,40 97,12 172,40"/><rect x="18" y="110" width="158" height="6"/><rect x="14" y="116" width="166" height="5"/></g><rect x="5" y="121" width="190" height="2" fill="#9e9b94"/></svg>`,valencia:`<svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg"><g fill="#9e9b94"><path d="M 20,100 Q 100,20 180,100 Z" opacity="0.9"/><path d="M 45,95 Q 100,50 155,95 Z" fill="#000"/><path d="M 60,92 Q 100,65 140,92 Z"/><ellipse cx="100" cy="85" rx="14" ry="8" fill="#000"/><rect x="10" y="100" width="180" height="3"/><rect x="5" y="120" width="190" height="2"/></g></svg>`,paris:`<svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg"><g fill="#9e9b94" stroke="#9e9b94" stroke-width="0.5"><path d="M 60,120 L 80,80 L 120,80 L 140,120 Z"/><path d="M 68,110 Q 100,95 132,110 L 132,80 L 68,80 Z" fill="#000"/><path d="M 60,120 L 80,80 L 82,80 L 65,120 Z"/><path d="M 140,120 L 120,80 L 118,80 L 135,120 Z"/><rect x="76" y="78" width="48" height="5"/><path d="M 82,78 L 92,45 L 108,45 L 118,78 Z"/><path d="M 84,72 L 94,50 L 96,50 L 86,72 Z" fill="#000"/><path d="M 116,72 L 106,50 L 104,50 L 114,72 Z" fill="#000"/><rect x="89" y="43" width="22" height="4"/><path d="M 92,43 L 98,20 L 102,20 L 108,43 Z"/><rect x="95" y="18" width="10" height="3"/><rect x="99" y="5" width="2" height="15"/></g><rect x="10" y="121" width="180" height="2" fill="#9e9b94"/></svg>`,london:`<svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg"><g fill="#9e9b94"><rect x="82" y="50" width="36" height="70"/><rect x="90" y="60" width="6" height="10" fill="#000"/><rect x="104" y="60" width="6" height="10" fill="#000"/><rect x="90" y="78" width="6" height="10" fill="#000"/><rect x="104" y="78" width="6" height="10" fill="#000"/><circle cx="100" cy="40" r="10" fill="#9e9b94"/><circle cx="100" cy="40" r="8" fill="#000"/><line x1="100" y1="40" x2="100" y2="34" stroke="#9e9b94" stroke-width="1.5"/><line x1="100" y1="40" x2="104" y2="42" stroke="#9e9b94" stroke-width="1.5"/><rect x="78" y="28" width="44" height="6"/><rect x="84" y="18" width="32" height="10"/><polygon points="84,18 100,2 116,18"/><rect x="75" y="118" width="50" height="3"/><rect x="30" y="100" width="40" height="20"/><rect x="130" y="100" width="40" height="20"/></g><rect x="5" y="121" width="190" height="2" fill="#9e9b94"/></svg>`,rome:`<svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg"><g fill="#9e9b94"><ellipse cx="100" cy="75" rx="88" ry="38"/><ellipse cx="100" cy="75" rx="76" ry="30" fill="#000"/><g fill="#000"><rect x="18" y="70" width="8" height="18"/><rect x="32" y="67" width="8" height="22"/><rect x="46" y="65" width="8" height="25"/><rect x="62" y="63" width="8" height="27"/><rect x="80" y="62" width="8" height="28"/><rect x="98" y="62" width="8" height="28"/><rect x="116" y="63" width="8" height="27"/><rect x="132" y="65" width="8" height="25"/><rect x="146" y="67" width="8" height="22"/><rect x="160" y="70" width="8" height="18"/></g><path d="M 30,42 Q 60,30 90,32 L 90,50 Q 60,42 30,55 Z"/><rect x="5" y="113" width="190" height="3"/></g></svg>`,amsterdam:`<svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg"><g fill="#9e9b94"><rect x="20" y="60" width="30" height="55"/><polygon points="20,60 20,50 26,50 26,44 34,44 34,38 42,38 42,44 50,44 50,50 56,50 56,60"/><rect x="58" y="55" width="28" height="60"/><path d="M 58,55 Q 58,45 63,42 Q 72,38 81,42 Q 86,45 86,55 Z"/><rect x="94" y="50" width="32" height="65"/><polygon points="94,50 94,42 102,42 102,34 118,34 118,42 126,42 126,50"/><polygon points="102,34 110,24 118,34"/><rect x="134" y="58" width="28" height="57"/><polygon points="134,58 134,48 139,48 139,42 147,42 147,36 153,36 153,42 161,42 161,48 162,48 162,58"/><rect x="168" y="62" width="22" height="53"/><polygon points="168,62 168,54 179,48 190,54 190,62"/><rect x="0" y="115" width="200" height="4"/></g></svg>`,nyc:`<svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg"><g fill="#9e9b94"><rect x="5" y="90" width="14" height="30"/><rect x="22" y="80" width="16" height="40"/><rect x="42" y="55" width="18" height="65"/><polygon points="42,55 51,35 60,55"/><rect x="50" y="25" width="2" height="10"/><rect x="66" y="35" width="24" height="85"/><rect x="72" y="25" width="12" height="10"/><rect x="76" y="15" width="4" height="10"/><rect x="77" y="5" width="2" height="10"/><rect x="94" y="70" width="16" height="50"/><rect x="114" y="60" width="18" height="60"/><rect x="136" y="28" width="22" height="92"/><rect x="145" y="18" width="4" height="10"/><rect x="146" y="5" width="2" height="13"/><rect x="162" y="75" width="16" height="45"/><rect x="180" y="85" width="15" height="35"/></g><rect x="0" y="120" width="200" height="2" fill="#9e9b94"/></svg>`,tokyo:`<svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg"><g fill="#9e9b94" stroke="#9e9b94" stroke-width="0.5"><path d="M 55,120 L 80,70 L 120,70 L 145,120 Z"/><path d="M 65,115 Q 100,90 135,115 L 135,72 L 65,72 Z" fill="#000"/><path d="M 55,120 L 80,70 L 82,70 L 60,120 Z"/><path d="M 145,120 L 120,70 L 118,70 L 140,120 Z"/><rect x="76" y="68" width="48" height="4"/><path d="M 82,68 L 90,40 L 110,40 L 118,68 Z"/><rect x="88" y="38" width="24" height="4"/><rect x="90" y="32" width="20" height="6"/><rect x="94" y="15" width="12" height="17"/><rect x="96" y="10" width="8" height="5"/><rect x="99" y="1" width="2" height="10"/></g><rect x="10" y="120" width="180" height="2" fill="#9e9b94"/></svg>`};
+
+const races=[
+{id:'berlin',name:'Berlin Marathon',city:'Berlin, Germany',icon:'berlin',date:'27 Sep 2026',month:9,priceFrom:'€1,290',terrain:'Flat & fast',status:'open',
+desc1:'The Berlin Marathon is the home of world records — flat, fast, and lined with 1 million spectators. Run through the Brandenburg Gate. Cross the line where Eliud Kipchoge made history.',
+desc2:'Our package puts you at a 4★ hotel within walking distance of the start, with everything pre-arranged so you can focus entirely on race day.',
+photos:['Brandenburg Gate at sunrise','Race day on Strasse des 17. Juni','Reichstag finish','Berliner Dom','Hotel Adlon lobby','Race expo','Pasta party','Medal ceremony'],
+hotels:[
+{id:'h1',name:'Hotel Adlon Kempinski',area:'Brandenburg Gate · 5★',stars:5,features:['Steps from the start line','Full breakfast included','Spa & wellness centre','Late checkout race day'],singlePrice:1890,twinPrice:3290,website:'https://www.kempinski.com/en/hotel-adlon'},
+{id:'h2',name:'Hotel de Rome',area:'Mitte · 5★',stars:5,features:['Historic luxury hotel','Rooftop terrace bar','Indoor pool & spa','10 min walk to start'],singlePrice:1690,twinPrice:2890,website:'https://www.roccofortehotels.com/hotels-and-resorts/hotel-de-rome/'},
+{id:'h3',name:'Park Inn Alexanderplatz',area:'Alexanderplatz · 4★',stars:4,features:['Central, modern rooms','Buffet breakfast','Easy U-Bahn access','Excellent value'],singlePrice:1290,twinPrice:2290,website:'https://www.radissonhotels.com/en-us/hotels/park-inn-berlin-alexanderplatz'}
+]},
+{id:'frankfurt',name:'Frankfurt Marathon',city:'Frankfurt, Germany',icon:'frankfurt',date:'25 Oct 2026',month:10,priceFrom:'€1,190',terrain:'Flat & fast',status:'open',
+desc1:"Germany's oldest marathon, finishing inside the iconic Festhalle to a roaring crowd and red carpet. Fast, flat, and with one of the most spectacular finishes in world running.",
+desc2:'Our package includes a 4★ hotel near the start, all transfers, and a One Run team on the ground throughout race weekend.',
+photos:['Frankfurt skyline','Main Tower view','Festhalle finish line','Old Town Römer','Race route on the Main','Pasta party','Cheering crowds','Medal moment'],
+hotels:[
+{id:'h1',name:'Steigenberger Frankfurter Hof',area:'Old Town · 5★',stars:5,features:['Iconic luxury hotel','Walking distance to expo','Marathon partner hotel','Spa access included'],singlePrice:1690,twinPrice:2890,website:'https://www.hrewards.com/en/steigenberger-frankfurter-hof'},
+{id:'h2',name:'NH Collection Frankfurt',area:'City Centre · 4★',stars:4,features:['Modern, design-focused','Excellent breakfast','5 min to start area','Late checkout race day'],singlePrice:1390,twinPrice:2390,website:'https://www.nh-collection.com/en/hotel/nh-collection-frankfurt-city'},
+{id:'h3',name:'Hotel Bristol Frankfurt',area:'Hauptbahnhof · 4★',stars:4,features:['Convenient station location','Buffet breakfast','Pre-race carb dinner','Best value option'],singlePrice:1190,twinPrice:2090,website:'https://www.bristol-hotel.de/'}
+]},
+{id:'athens',name:'Athens Classic Marathon',city:'Athens, Greece',icon:'athens',date:'8 Nov 2026',month:11,priceFrom:'€890',terrain:'Hilly',status:'open',
+desc1:'The original. Run from Marathon to Athens along the route Pheidippides took in 490 BC, finishing inside the marble Panathenaic Stadium.',
+desc2:'A bucket-list race for any serious runner. Our package includes accommodation in central Athens, with optional add-ons for Acropolis tours and Aegean island extensions.',
+photos:['Acropolis at golden hour','Panathenaic Stadium','Marathon village start','Plaka district','Race expo','Welcome dinner','Hotel rooftop view','Olive ceremony'],
+hotels:[
+{id:'h1',name:'Hotel Grande Bretagne',area:'Syntagma Square · 5★',stars:5,features:['Acropolis-view rooftop','Marathon finish line views','Luxury spa','Greek breakfast included'],singlePrice:1490,twinPrice:2590,website:'https://www.grandebretagne.gr/'},
+{id:'h2',name:'Electra Metropolis',area:'Plaka · 5★',stars:5,features:['Boutique luxury','Rooftop pool with Acropolis view','Walking distance to finish','Mediterranean breakfast'],singlePrice:1190,twinPrice:1990,website:'https://www.electrahotels.gr/electra-metropolis-hotel-athens/'},
+{id:'h3',name:'Athens Tiare Hotel',area:'Omonia · 4★',stars:4,features:['Central modern hotel','Sky lounge','Buffet breakfast','Excellent value'],singlePrice:890,twinPrice:1490,website:'https://www.athenstiarehotel.com/'}
+]},
+{id:'valencia',name:'Valencia Marathon',city:'Valencia, Spain',icon:'valencia',date:'6 Dec 2026',month:12,priceFrom:'€990',terrain:'Flat & fast',status:'open',
+desc1:"Europe's fastest marathon, set against Valencia's sunshine, futuristic City of Arts & Sciences architecture, and Mediterranean coast.",
+desc2:'Famous for personal-best conditions and a phenomenal finish line atmosphere. We pair it with a beachside hotel for proper recovery.',
+photos:['City of Arts & Sciences','Hemisfèric','Mediterranean coastline','Valencia Old Town','Race start area','Finish line','Paella celebration','Beach recovery'],
+hotels:[
+{id:'h1',name:'Hotel Las Arenas Balneario',area:'Playa Malvarrosa · 5★',stars:5,features:['Beachfront luxury','Spa & wellness','Olympic pool','Mediterranean cuisine'],singlePrice:1490,twinPrice:2490,website:'https://www.hotelvalencialasarenas.com/'},
+{id:'h2',name:'Caro Hotel',area:'Old Town · 5★',stars:5,features:['Historic boutique','12 min to start','Restaurant on-site','Quiet courtyard rooms'],singlePrice:1290,twinPrice:2190,website:'https://www.carohotel.com/'},
+{id:'h3',name:'Vincci Lys',area:'City Centre · 4★',stars:4,features:['Modern central hotel','Walking distance to start','Buffet breakfast','Great value'],singlePrice:990,twinPrice:1790,website:'https://www.vinccihoteles.com/eng/Hotels/Spain/Valencia/Vincci-Lys'}
+]},
+{id:'paris',name:'Paris Marathon',city:'Paris, France',icon:'paris',date:'12 Apr 2026',month:4,priceFrom:'€1,390',terrain:'Urban',status:'soldout',
+desc1:'Start at the Champs-Élysées, finish near the Arc de Triomphe.',desc2:"A celebration of running through the world's most beautiful city.",
+hotels:[]},
+{id:'london',name:'London Marathon',city:'London, UK',icon:'london',date:'26 Apr 2026',month:4,priceFrom:'€1,590',terrain:'Urban',status:'soldout',
+desc1:'Six bridges, the Tower of London, Canary Wharf, Buckingham Palace.',desc2:'World Major status. Crowd support is unmatched.',
+hotels:[]},
+{id:'rome',name:'Rome Marathon',city:'Rome, Italy',icon:'rome',date:'22 Mar 2026',month:3,priceFrom:'€1,090',terrain:'Hilly',status:'express',
+desc1:'Run past 2,000 years of history — the Colosseum, Roman Forum, Vatican City, and Trevi Fountain.',desc2:'Cobblestone sections add character. A truly unique marathon experience.',
+hotels:[]},
+{id:'amsterdam',name:'Amsterdam Marathon',city:'Amsterdam, Netherlands',icon:'amsterdam',date:'18 Oct 2026',month:10,priceFrom:'€1,150',terrain:'Flat & fast',status:'express',
+desc1:"A flat, fast, autumn marathon through Amsterdam's Vondelpark and finishing in the Olympic Stadium.",desc2:'Stay in a canal-side hotel and turn the trip into a perfect long weekend.',
+hotels:[]},
+{id:'nyc',name:'New York City Marathon',city:'New York, USA',icon:'nyc',date:'1 Nov 2026',month:11,priceFrom:'€2,890',terrain:'Hilly',status:'express',
+desc1:'The biggest marathon in the world. 50,000 runners through all 5 boroughs, finishing in Central Park.',desc2:'A World Major. Our New York package includes Manhattan accommodation and pre-race orientation.',
+hotels:[]},
+{id:'tokyo',name:'Tokyo Marathon',city:'Tokyo, Japan',icon:'tokyo',date:'1 Mar 2026',month:3,priceFrom:'€2,490',terrain:'Flat & fast',status:'soldout',
+desc1:'Run through the Imperial Palace, Asakusa, and Ginza districts.',desc2:'A World Major. Cherry blossom season optional.',
+hotels:[]}
+];
+
+const statusConfig={open:{label:'Open for registration',class:'open',btnLabel:'Book now',btnClass:''},soldout:{label:'Sold out',class:'soldout',btnLabel:'Sold out',btnClass:'disabled'},express:{label:'Express interest',class:'express',btnLabel:'Register interest',btnClass:'express-btn'}};
+
+let currentRace=null,currentPackageType='single',currentHotel=null,currentRunnerCount=1;
+
+function renderRaces(list){
+const grid=document.getElementById('racesGrid');
+if(list.length===0){grid.innerHTML=`<div style="padding:60px 20px;grid-column:1/-1;text-align:center;color:var(--mute);font-size:13px;letter-spacing:1px;">No races match your filters.</div>`;return}
+grid.innerHTML=list.map(r=>{
+const s=statusConfig[r.status];
+let onclick='';
+if(r.status==='open')onclick=`onclick="openDetail('${r.id}')"`;
+if(r.status==='express')onclick=`onclick="openInterest('${r.name}')"`;
+return `<article class="race-card"><div class="race-icon">${icons[r.icon]}</div><div class="race-city">${r.city}</div><h3 class="race-name">${r.name}</h3><div class="race-info"><div class="race-info-row"><span class="race-info-label">Date</span><span class="race-info-value">${r.date}</span></div><div class="race-info-row"><span class="race-info-label">Rate from</span><span class="race-info-value">${r.priceFrom}</span></div><div class="race-info-row"><span class="race-info-label">Course</span><span class="race-info-value">${r.terrain}</span></div></div><div class="race-status"><span class="status-pill ${s.class}">${s.label}</span></div><button class="race-btn ${s.btnClass}" ${r.status==='soldout'?'disabled':''} ${onclick}>${s.btnLabel}</button></article>`;
+}).join('');
+}
+
+function applyFilters(){
+const m=document.getElementById('filterMonth').value;
+const t=document.getElementById('filterTerrain').value;
+const s=document.getElementById('filterStatus').value;
+const filtered=races.filter(r=>(m==='all'||r.month===parseInt(m))&&(t==='all'||r.terrain===t)&&(s==='all'||r.status===s));
+renderRaces(filtered);
+}
+function resetFilters(){
+document.getElementById('filterMonth').value='all';
+document.getElementById('filterTerrain').value='all';
+document.getElementById('filterStatus').value='all';
+renderRaces(races);
+}
+
+function openDetail(id){
+const r=races.find(x=>x.id===id);if(!r)return;
+currentRace=r;currentHotel=null;currentPackageType=null;currentRunnerCount=0;
+document.getElementById('dCity').textContent=r.city;
+document.getElementById('dName').textContent=r.name;
+document.getElementById('dDate').textContent=r.date;
+document.getElementById('dTerrain').textContent=r.terrain;
+document.getElementById('dPrice').textContent=r.priceFrom;
+document.getElementById('dDesc1').textContent=r.desc1;
+
+// Render photo gallery — landmark icon as first item, then race photos
+const gallery=document.getElementById('dPhotosGallery');
+const photos=r.photos||[];
+gallery.innerHTML=`<div class="gallery-photo icon-photo">${icons[r.icon]}</div>` +
+photos.map(p=>`<div class="gallery-photo"><span>${p}</span></div>`).join('');
+gallery.scrollLeft=0;
+
+renderHotels();
+resetOccupancy();
+document.getElementById('continueText').textContent='No package selected';
+document.getElementById('continueBtn').disabled=true;
+document.getElementById('homepage').style.display='none';
+document.getElementById('detailPage').classList.add('active');
+window.scrollTo(0,0);
+}
+
+function switchTab(tab){
+// kept for compatibility — not used in new flow
+}
+
+function renderHotels(){
+const grid=document.getElementById('hotelsGrid');
+if(!currentRace.hotels||currentRace.hotels.length===0){
+grid.innerHTML=`<div style="padding:40px 20px;text-align:center;color:var(--mute);font-size:13px;">Hotel options coming soon.</div>`;
+return;
+}
+grid.innerHTML=currentRace.hotels.map(h=>{
+const stars='★'.repeat(h.stars);
+const features=h.features.slice(0,2).join(' · ');
+const websiteBtn=h.website?`<a href="${h.website}" target="_blank" rel="noopener noreferrer" class="hc-website-link" onclick="event.stopPropagation()">Visit ↗</a>`:'';
+return `<article class="hotel-card-compact" onclick="selectHotel(this,'${h.id}')">
+${websiteBtn}
+<div class="hc-photo"><span>${h.name}</span></div>
+<div class="hc-content">
+<div class="hc-name-row"><span class="hc-name">${h.name}</span><span class="hc-stars">${stars}</span></div>
+<div class="hc-area">${h.area}</div>
+<div class="hc-features">${features} · from €${h.singlePrice.toLocaleString()}</div>
+</div>
+</article>`;
+}).join('');
+}
+
+function selectHotel(card,hotelId){
+document.querySelectorAll('.hotel-card-compact').forEach(c=>c.classList.remove('selected'));
+card.classList.add('selected');
+currentHotel=currentRace.hotels.find(h=>h.id===hotelId);
+
+// Populate the occupancy dropdown with this hotel's options
+const sel=document.getElementById('occupancySelect');
+sel.innerHTML=`
+<option value="">Choose room & occupancy…</option>
+<option value="single">${currentHotel.name} — Single Room & 1 Race Entry — €${currentHotel.singlePrice.toLocaleString()}</option>
+<option value="twin">${currentHotel.name} — Twin / Double Room & 2 Race Entries — €${currentHotel.twinPrice.toLocaleString()}</option>
+`;
+sel.disabled=false;
+sel.value='';
+currentPackageType=null;
+document.getElementById('continueText').textContent='Now choose your room type…';
+document.getElementById('continueBtn').disabled=true;
+}
+
+function selectOccupancy(){
+const v=document.getElementById('occupancySelect').value;
+if(!v){currentPackageType=null;document.getElementById('continueBtn').disabled=true;return}
+currentPackageType=v;
+currentRunnerCount=v==='single'?1:2;
+const price=v==='single'?currentHotel.singlePrice:currentHotel.twinPrice;
+const roomLabel=v==='single'?'Single Room & 1 Race Entry':'Twin / Double Room & 2 Race Entries';
+document.getElementById('continueText').innerHTML=`<strong>${currentHotel.name}</strong> · ${roomLabel} — <strong>€${price.toLocaleString()}</strong>`;
+document.getElementById('continueBtn').disabled=false;
+}
+
+function resetOccupancy(){
+const sel=document.getElementById('occupancySelect');
+sel.innerHTML=`<option value="">Pick a hotel first…</option>`;
+sel.disabled=true;
+}
+
+function showHome(){
+document.getElementById('homepage').style.display='block';
+document.getElementById('detailPage').classList.remove('active');
+document.getElementById('bookingPage').classList.remove('active');
+document.getElementById('confirmPage').classList.remove('active');
+window.scrollTo(0,0);
+}
+
+function backToDetail(){
+document.getElementById('bookingPage').classList.remove('active');
+document.getElementById('detailPage').classList.add('active');
+window.scrollTo(0,0);
+}
+
+function goToBooking(){
+if(!currentHotel)return;
+document.getElementById('bCity').textContent=currentRace.city;
+document.getElementById('bName').textContent=currentRace.name;
+const pkgLabel=currentPackageType==='single'?'Single Room & 1 Race Entry':'Twin / Double Room & 2 Race Entries';
+document.getElementById('bPkg').innerHTML=`${pkgLabel}<br><span style="font-size:13px;color:var(--mute);font-weight:400;">${currentHotel.name}</span>`;
+const price=currentPackageType==='single'?currentHotel.singlePrice:currentHotel.twinPrice;
+document.getElementById('bTotal').textContent='€'+price.toLocaleString();
+
+const container=document.getElementById('runnersContainer');
+container.innerHTML='';
+for(let i=1;i<=currentRunnerCount;i++){
+container.innerHTML+=`<div class="runner-form"><div class="runner-form-title"><span class="runner-num">${i}</span>${currentRunnerCount===1?'Runner registration':'Runner '+i+' — registration'}</div><div class="form-grid"><div class="form-group full"><label class="form-label">Full name</label><input type="text" class="form-input" placeholder="As shown on passport / ID" required></div><div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" required></div><div class="form-group"><label class="form-label">Telephone number</label><input type="tel" class="form-input" placeholder="+30 ..." required></div><div class="form-group"><label class="form-label">Nationality</label><input type="text" class="form-input" required></div><div class="form-group"><label class="form-label">ID or passport number</label><input type="text" class="form-input" required></div><div class="form-group"><label class="form-label">Expected race completion time</label><input type="text" class="form-input" placeholder="e.g. 3:45:20" required></div><div class="form-group"><label class="form-label optional">Previous race certificate</label><label class="form-file"><input type="file" accept=".pdf,.jpg,.jpeg,.png"><span>📎 Attach file (PDF, JPG, PNG)</span></label></div><div class="form-group full"><label class="form-label optional">Special requirements</label><textarea class="form-input form-textarea" rows="3" placeholder="Dietary, accessibility, medical, kit pickup preferences..."></textarea></div></div></div>`;
+}
+
+// Each runner has their own special requirements — no global remarks section needed
+
+document.getElementById('detailPage').classList.remove('active');
+document.getElementById('bookingPage').classList.add('active');
+window.scrollTo(0,0);
+}
+
+function processPayment(e){
+e.preventDefault();
+const price=currentPackageType==='single'?currentHotel.singlePrice:currentHotel.twinPrice;
+const pkgLabel=currentPackageType==='single'?'Single Room & 1 Race Entry':'Twin / Double Room & 2 Race Entries';
+const ref='ONR-'+Date.now().toString().slice(-6)+'-'+currentRace.id.slice(0,3).toUpperCase();
+document.getElementById('cRace').textContent=currentRace.name;
+document.getElementById('cPkg').innerHTML=`${pkgLabel}<br><span style="font-size:11px;color:var(--mute);">${currentHotel.name}</span>`;
+document.getElementById('cRef').textContent=ref;
+document.getElementById('cTotal').textContent='€'+price.toLocaleString();
+document.getElementById('bookingPage').classList.remove('active');
+document.getElementById('confirmPage').classList.add('active');
+window.scrollTo(0,0);
+}
+
+function openInterest(name){
+document.getElementById('modalRaceName').textContent=name;
+document.getElementById('modalRaceInput').value=name;
+document.getElementById('modalBackdrop').classList.add('active');
+}
+function closeModal(){document.getElementById('modalBackdrop').classList.remove('active');}
+function submitInterest(e){
+e.preventDefault();
+alert("Thank you! We'll be in touch with full package details.");
+e.target.reset();closeModal();
+}
+document.getElementById('modalBackdrop').addEventListener('click',(e)=>{if(e.target.id==='modalBackdrop')closeModal();});
+
+renderRaces(races);
+</script>
+</body>
+</html>
