@@ -13,8 +13,9 @@ COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/package.json ./
 COPY --from=build /app/drizzle.config.ts ./
 COPY --from=build /app/src ./src
+COPY start.sh ./
 
 ENV HOST=0.0.0.0
 ENV PORT=4321
 
-CMD sh -c "node_modules/.bin/drizzle-kit push; node dist/server/entry.mjs"
+CMD ["sh", "start.sh"]
