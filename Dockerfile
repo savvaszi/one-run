@@ -3,7 +3,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
-RUN npx drizzle-kit push
+RUN mkdir -p data && npx drizzle-kit push
 RUN npm run build
 
 FROM node:20-alpine AS runtime

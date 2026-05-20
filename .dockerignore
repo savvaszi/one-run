@@ -4,6 +4,5 @@ dist
 docs
 *.md
 index.html
-*.jpg
-*.png
 *.docx
+index.html
