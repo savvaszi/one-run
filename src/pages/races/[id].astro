@@ -1,0 +1,181 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Base from '../../layouts/Base.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+import Logo from '../../components/Logo.astro';
+import IconSVG from '../../components/IconSVG.astro';
+import HotelCardCompact from '../../components/HotelCardCompact.astro';
+import { db } from '../../db/index';
+import { races as racesTable, hotels as hotelsTable } from '../../db/schema';
+import { eq } from 'drizzle-orm';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const allRaces = await db.select().from(racesTable).all();
+  return allRaces.map(r => ({ params: { id: r.id } }));
+};
+
+const { id } = Astro.params;
+const race = await db.select().from(racesTable).where(eq(racesTable.id, id!)).get();
+if (!race) return Astro.redirect('/');
+
+const racePhotos = JSON.parse(race.photos || '[]') as string[];
+const includedItems = JSON.parse(race.included || '[]') as string[];
+const raceHotels = await db.select().from(hotelsTable).where(eq(hotelsTable.race_id, id!)).all();
+const hotelsData = raceHotels.map(h => ({ ...h, features: JSON.parse(h.features || '[]') }));
+
+const hasHotels = hotelsData.length > 0;
+const anySeats = hotelsData.some((h: any) => (h.total_seats - h.booked_seats) > 0);
+const isBookable = race.status === 'open' && hasHotels && anySeats;
+---
+
+<Base title={`${race.name} — One Run`}>
+  <Nav />
+
+  <div class="detail-page active" id="detailPage">
+    <div class="detail-nav">
+      <a href="/" class="detail-back"><span class="detail-back-arrow"></span>Back to races</a>
+      <Logo />
+    </div>
+
+    <section class="detail-compact">
+      <div class="detail-left">
+        <div class="detail-header">
+          <div class="race-city">{race.city}</div>
+          <h1>{race.name}</h1>
+        </div>
+
+        <div class="detail-meta-strip">
+          <div class="meta-item"><div class="meta-l">Date</div><div class="meta-v">{race.date}</div></div>
+          <div class="meta-item"><div class="meta-l">Distance</div><div class="meta-v">42.195 km</div></div>
+          <div class="meta-item"><div class="meta-l">Terrain</div><div class="meta-v">{race.terrain}</div></div>
+          <div class="meta-item"><div class="meta-l">From</div><div class="meta-v">{race.price_from}</div></div>
+        </div>
+
+        <div class="detail-info-row">
+          <div class="detail-desc-compact"><p>{race.desc1}</p></div>
+          <div class="detail-included-compact">
+            <h3>Included</h3>
+            <ul class="included-list-compact">
+              {includedItems.map((item: string) => <li>{item}</li>)}
+            </ul>
+          </div>
+        </div>
+
+        <div class="detail-photos-stack" id="dPhotosGallery">
+          <div class="gallery-photo icon-photo">
+            <IconSVG name={race.icon} />
+          </div>
+          {racePhotos.map((p: string) => <div class="gallery-photo"><span>{p}</span></div>)}
+        </div>
+      </div>
+
+      <div class="detail-right">
+        <div class="detail-right-header">
+          <div class="section-tag" style="margin-bottom:6px;">Step 1 — choose your hotel</div>
+          <h3 class="detail-right-title">Hotels &amp; <em>packages</em></h3>
+        </div>
+
+        <div class="hotels-grid-compact" id="hotelsGrid">
+          {hotelsData.length === 0 ? (
+            <div style="padding:40px 20px;text-align:center;color:var(--mute);font-size:13px;">Hotel options coming soon.</div>
+          ) : (
+            hotelsData.map((h: any) => <HotelCardCompact hotel={h} bookable={isBookable} />)
+          )}
+        </div>
+
+        {isBookable ? (
+          <>
+            <div class="detail-right-header" style="margin-top:14px;">
+              <div class="section-tag" style="margin-bottom:6px;">Step 2 — choose room &amp; occupancy</div>
+            </div>
+            <div class="occupancy-section">
+              <select class="occupancy-select" id="occupancySelect" onchange="selectOccupancy()" disabled>
+                <option value="">Pick a hotel first…</option>
+              </select>
+            </div>
+            <div class="continue-bar-compact">
+              <div class="continue-info-compact" id="continueText">No package selected</div>
+              <button class="continue-btn" id="continueBtn" disabled onclick="goToBooking()">Continue &rarr;</button>
+            </div>
+          </>
+        ) : (
+          <div class="continue-bar-compact">
+            <div class="continue-info-compact">This race is currently not open for booking.</div>
+            <button class="continue-btn" style="width:100%;background:var(--accent);color:var(--bg);" onclick={`openInterest('${(race.name || '').replace(/'/g, "\\'")}')`}>Express interest</button>
+          </div>
+        )}
+      </div>
+    </section>
+  </div>
+
+  <Footer />
+
+  <script id="hotels-data" type="application/json">{JSON.stringify(hotelsData)}</script>
+  <script>
+    let currentHotel: any = null;
+    let currentPackageType: string | null = null;
+
+    const hotelsJson = JSON.parse(document.getElementById('hotels-data')!.textContent || '[]');
+
+    function selectHotel(card: HTMLElement, hotelId: string) {
+      document.querySelectorAll('.hotel-card-compact').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      currentHotel = hotelsJson.find((h: any) => h.id === hotelId);
+
+      const sel = document.getElementById('occupancySelect') as HTMLSelectElement;
+      sel.innerHTML = `<option value="">Choose room & occupancy&hellip;</option>
+        <option value="single">${currentHotel.name} — Single Room &amp; 1 Race Entry — €${currentHotel.single_price.toLocaleString()}</option>
+        <option value="twin">${currentHotel.name} — Twin / Double Room &amp; 2 Race Entries — €${currentHotel.twin_price.toLocaleString()}</option>`;
+      sel.disabled = false;
+      sel.value = '';
+      currentPackageType = null;
+      (document.getElementById('continueText') as HTMLElement).textContent = 'Now choose your room type…';
+      (document.getElementById('continueBtn') as HTMLButtonElement).disabled = true;
+    }
+
+    function selectOccupancy() {
+      const v = (document.getElementById('occupancySelect') as HTMLSelectElement).value;
+      if (!v) { currentPackageType = null; (document.getElementById('continueBtn') as HTMLButtonElement).disabled = true; return; }
+      currentPackageType = v;
+      const price = v === 'single' ? currentHotel.single_price : currentHotel.twin_price;
+      const roomLabel = v === 'single' ? 'Single Room & 1 Race Entry' : 'Twin / Double Room & 2 Race Entries';
+      (document.getElementById('continueText') as HTMLElement).innerHTML = `<strong>${currentHotel.name}</strong> &middot; ${roomLabel} — <strong>€${price.toLocaleString()}</strong>`;
+      (document.getElementById('continueBtn') as HTMLButtonElement).disabled = false;
+    }
+
+    function goToBooking() {
+      if (!currentHotel) return;
+      const searchParams = new URLSearchParams({
+        race_id: '${race.id}',
+        hotel_id: currentHotel.id,
+        package_type: currentPackageType || 'single'
+      });
+      window.location.href = `/booking?${searchParams.toString()}`;
+    }
+
+    function openInterest(name: string) {
+      const modal = document.getElementById('modalBackdrop');
+      if (modal) {
+        (document.getElementById('modalRaceName') as HTMLElement).textContent = name;
+        (document.getElementById('modalRaceInput') as HTMLInputElement).value = name;
+        (document.getElementById('interestRaceName') as HTMLInputElement).value = name;
+        modal.classList.add('active');
+      } else {
+        alert(`Express interest: ${name}`);
+      }
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('modalBackdrop');
+      if (modal) modal.classList.remove('active');
+    }
+
+    document.querySelectorAll('.hotel-card-compact').forEach(card => {
+      card.addEventListener('click', function() {
+        const hotelId = (this as HTMLElement).dataset.hotelId;
+        if (hotelId) selectHotel(this as HTMLElement, hotelId);
+      });
+    });
+  </script>
+</Base>
