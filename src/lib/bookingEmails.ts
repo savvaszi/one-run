@@ -15,6 +15,10 @@ function getTransporter(): Transporter | null {
     port: Number(process.env.SMTP_PORT) || 465,
     secure: true,
     auth: { user, pass },
+    connectionTimeout: 10000,
+    greetingTimeout: 5000,
+    socketTimeout: 10000,
+    tls: { rejectUnauthorized: false },
   });
 }
 
