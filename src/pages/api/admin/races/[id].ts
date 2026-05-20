@@ -1,3 +1,5 @@
+export const prerender = false;
+
 import type { APIRoute } from 'astro';
 import { isAdmin } from '../../../../lib/auth';
 import { db } from '../../../../db/index';
@@ -27,3 +29,4 @@ export const DELETE: APIRoute = async ({ cookies, params }) => {
   await db.delete(races).where(eq(races.id, params.id!));
   return new Response(JSON.stringify({ ok: true }), { status: 200 });
 };
+

@@ -1,8 +1,10 @@
 import type { APIRoute } from 'astro';
-import { isAdmin } from '../../../../lib/auth';
-import { db } from '../../../../db/index';
-import { bookings, hotels } from '../../../../db/schema';
+import { isAdmin } from '../../../../../lib/auth';
+import { db } from '../../../../../db/index';
+import { bookings, hotels } from '../../../../../db/schema';
 import { eq } from 'drizzle-orm';
+
+export const prerender = false;
 
 export const POST: APIRoute = async ({ cookies, params }) => {
   if (!isAdmin(cookies)) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });

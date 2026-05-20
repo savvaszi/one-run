@@ -1,3 +1,5 @@
+export const prerender = false;
+
 import type { APIRoute } from 'astro';
 import { verifyPassword, setAdminCookie } from '../../../lib/auth';
 
@@ -14,3 +16,4 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     return new Response(JSON.stringify({ error: 'Invalid request' }), { status: 400 });
   }
 };
+

@@ -1,3 +1,5 @@
+export const prerender = false;
+
 import type { APIRoute } from 'astro';
 import { db } from '../../../../db/index';
 import { bookings } from '../../../../db/schema';
@@ -12,3 +14,4 @@ export const GET: APIRoute = async ({ params }) => {
     race_id: booking.race_id,
   }), { status: 200 });
 };
+
