@@ -1,0 +1,9 @@
+node_modules
+dist
+.git
+docs
+*.md
+index.html
+*.jpg
+*.png
+*.docx
