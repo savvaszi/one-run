@@ -1,0 +1,114 @@
+---
+import Base from '../../../layouts/Base.astro';
+import AdminNav from '../../../components/AdminNav.astro';
+import { db } from '../../../db/index';
+import { races as racesTable, hotels as hotelsTable } from '../../../db/schema';
+import { eq } from 'drizzle-orm';
+import { isAdmin } from '../../../lib/auth';
+
+export const prerender = false;
+if (!isAdmin(Astro.cookies)) return Astro.redirect('/admin/login');
+
+const { id } = Astro.params;
+const race = await db.select().from(racesTable).where(eq(racesTable.id, id!)).get();
+if (!race) return Astro.redirect('/admin/races');
+
+const raceHotels = await db.select().from(hotelsTable).where(eq(hotelsTable.race_id, id!)).all();
+const hotelData = raceHotels.map(h => ({ ...h, features: JSON.parse(h.features || '[]') }));
+---
+
+<Base title={`Edit ${race.name} — Admin — One Run`}>
+  <AdminNav />
+  <section style="padding:120px 48px 80px;max-width:900px;margin:0 auto;">
+    <a href="/admin/races" style="color:var(--mute);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;">&larr; Back to races</a>
+    <h2 class="section-title" style="margin:16px 0 32px;">Edit <em>{race.name}</em></h2>
+
+    <form id="editRaceForm" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:48px;">
+      <div class="form-group"><label class="form-label">Name</label><input class="form-input" name="name" value={race.name} required /></div>
+      <div class="form-group"><label class="form-label">City</label><input class="form-input" name="city" value={race.city} required /></div>
+      <div class="form-group"><label class="form-label">Date</label><input class="form-input" name="date" value={race.date} required /></div>
+      <div class="form-group"><label class="form-label">Month</label><input class="form-input" name="month" type="number" value={race.month} required /></div>
+      <div class="form-group"><label class="form-label">Price from</label><input class="form-input" name="price_from" value={race.price_from} required /></div>
+      <div class="form-group"><label class="form-label">Status</label>
+        <select class="form-input" name="status" style="background:transparent;color:var(--fg);border:1px solid var(--border);padding:14px 16px;">
+          <option value="open" selected={race.status === 'open'}>Open</option>
+          <option value="express" selected={race.status === 'express'}>Express</option>
+          <option value="soldout" selected={race.status === 'soldout'}>Sold out</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Terrain</label>
+        <select class="form-input" name="terrain" style="background:transparent;color:var(--fg);border:1px solid var(--border);padding:14px 16px;">
+          <option value="Flat & fast" selected={race.terrain === 'Flat & fast'}>Flat &amp; fast</option>
+          <option value="Hilly" selected={race.terrain === 'Hilly'}>Hilly</option>
+          <option value="Urban" selected={race.terrain === 'Urban'}>Urban</option>
+        </select>
+      </div>
+      <div class="form-group" style="grid-column:span 2;"><label class="form-label">Description</label><textarea class="form-input form-textarea" name="desc1" rows="3" required>{race.desc1}</textarea></div>
+      <button type="submit" class="form-submit" style="grid-column:span 2;">Save changes</button>
+    </form>
+
+    <h3 style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:500;margin-bottom:20px;">Hotels</h3>
+    <div style="margin-bottom:24px;">
+      {hotelData.map((h: any) => (
+        <div style="background:var(--card);border:1px solid var(--border);padding:16px 20px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <strong style="color:var(--fg);display:block;">{h.name}</strong>
+            <span style="font-size:11px;color:var(--mute);">{h.area} · {h.booked_seats}/{h.total_seats} booked</span>
+          </div>
+          <button onclick={`deleteHotel('${h.id}')`} style="color:var(--red);background:none;border:none;cursor:pointer;font-size:11px;letter-spacing:1px;">Delete</button>
+        </div>
+      ))}
+    </div>
+
+    <details style="margin-bottom:32px;">
+      <summary style="cursor:pointer;color:var(--accent);font-size:12px;letter-spacing:1.5px;text-transform:uppercase;">+ Add hotel</summary>
+      <form id="addHotelForm" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px;padding:20px;background:var(--card);border:1px solid var(--border);">
+        <div class="form-group"><label class="form-label">Hotel ID</label><input class="form-input" name="id" required /></div>
+        <div class="form-group"><label class="form-label">Name</label><input class="form-input" name="name" required /></div>
+        <div class="form-group"><label class="form-label">Area</label><input class="form-input" name="area" required /></div>
+        <div class="form-group"><label class="form-label">Stars (1-5)</label><input class="form-input" name="stars" type="number" required /></div>
+        <div class="form-group"><label class="form-label">Single price (€)</label><input class="form-input" name="single_price" type="number" required /></div>
+        <div class="form-group"><label class="form-label">Twin price (€)</label><input class="form-input" name="twin_price" type="number" required /></div>
+        <div class="form-group"><label class="form-label">Total seats</label><input class="form-input" name="total_seats" type="number" value="50" required /></div>
+        <div class="form-group"><label class="form-label">Website URL</label><input class="form-input" name="website" /></div>
+        <div class="form-group" style="grid-column:span 2;"><label class="form-label">Features (comma-separated)</label><input class="form-input" name="features_str" placeholder="Pool, Spa, Breakfast" /></div>
+        <button type="submit" class="form-submit" style="grid-column:span 2;">Add hotel</button>
+      </form>
+    </details>
+  </section>
+</Base>
+
+<script>
+  const raceId = '{id}';
+  document.getElementById('editRaceForm')!.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target as HTMLFormElement;
+    const data = Object.fromEntries(new FormData(form));
+    data.month = parseInt(data.month as string);
+    const res = await fetch(`/api/admin/races/${raceId}`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data),
+    });
+    if (res.ok) alert('Saved!'); else alert('Failed to save');
+  });
+  document.getElementById('addHotelForm')!.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target as HTMLFormElement;
+    const data = Object.fromEntries(new FormData(form));
+    data.stars = parseInt(data.stars as string);
+    data.single_price = parseInt(data.single_price as string);
+    data.twin_price = parseInt(data.twin_price as string);
+    data.total_seats = parseInt(data.total_seats as string);
+    const featuresStr = (data.features_str as string) || '';
+    data.features = featuresStr.split(',').map((s: string) => s.trim()).filter(Boolean);
+    data.race_id = raceId;
+    const res = await fetch('/api/admin/hotels', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data),
+    });
+    if (res.ok) { window.location.reload(); } else { alert('Failed to add hotel'); }
+  });
+  async function deleteHotel(id: string) {
+    if (!confirm('Delete this hotel?')) return;
+    const res = await fetch(`/api/admin/hotels/${id}`, { method: 'DELETE' });
+    if (res.ok) { window.location.reload(); } else { alert('Failed to delete'); }
+  }
+</script>
