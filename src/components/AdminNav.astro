@@ -1,0 +1,12 @@
+---
+import Logo from './Logo.astro';
+---
+<nav style="background:rgba(0,0,0,0.92);border-bottom:1px solid var(--border);position:fixed;top:0;left:0;right:0;z-index:100;padding:14px 48px;display:flex;align-items:center;justify-content:space-between;">
+  <div style="display:flex;align-items:center;gap:36px;">
+    <Logo />
+    <a href="/admin" style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute);text-decoration:none;">Dashboard</a>
+    <a href="/admin/races" style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute);text-decoration:none;">Races</a>
+    <a href="/admin/settings" style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute);text-decoration:none;">Settings</a>
+  </div>
+  <a href="/" style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute);text-decoration:none;">View site</a>
+</nav>
