@@ -1,0 +1,41 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Base title="Cancellation Policy — One Run">
+  <Nav />
+  <section style="padding:160px 48px 80px;max-width:720px;margin:0 auto;">
+    <div class="section-tag">Legal</div>
+    <h2 class="section-title" style="margin-bottom:32px;">Cancellation <em>Policy</em></h2>
+    <div style="font-size:14px;line-height:1.9;color:rgba(243,239,232,0.65);">
+      <p style="margin-bottom:24px;">We understand that plans can change. Our cancellation policy is designed to be fair while protecting the commitments we make to race organizers and hotel partners on your behalf. All cancellation requests must be submitted in writing to <a href="mailto:info@one-run.net" style="color:var(--accent);">info@one-run.net</a>.</p>
+
+      <div style="background:rgba(243,239,232,0.02);border:1px solid var(--border);padding:28px 32px;margin:32px 0;">
+        <h3 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;color:#c9a86a;margin:0 0 8px;">More than 60 days before race day</h3>
+        <p style="margin:0;font-size:17px;font-weight:400;color:#f3efe8;">Full refund minus a &euro;50 administrative fee.</p>
+        <p style="margin:8px 0 0;color:var(--mute);">The &euro;50 fee covers bank charges, processing costs, and non-recoverable race entry fees already paid to organizers.</p>
+      </div>
+
+      <div style="background:rgba(243,239,232,0.02);border:1px solid var(--border);padding:28px 32px;margin:32px 0;">
+        <h3 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;color:#c9a86a;margin:0 0 8px;">30 to 60 days before race day</h3>
+        <p style="margin:0;font-size:17px;font-weight:400;color:#f3efe8;">50% refund of the total package price.</p>
+        <p style="margin:8px 0 0;color:var(--mute);">At this stage, race entries and hotel deposits are largely non-refundable. We return half of your payment to share the loss fairly.</p>
+      </div>
+
+      <div style="background:rgba(243,239,232,0.02);border:1px solid var(--border);padding:28px 32px;margin:32px 0;">
+        <h3 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;color:#c9a86a;margin:0 0 8px;">Less than 30 days before race day</h3>
+        <p style="margin:0;font-size:17px;font-weight:400;color:#f3efe8;">No refund.</p>
+        <p style="margin:8px 0 0;color:var(--mute);">By this point, all race entries, hotel rooms, and services have been fully paid and confirmed. No exceptions can be made.</p>
+      </div>
+
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:500;color:#f3efe8;margin:32px 0 16px;">Race cancellation by organizer</h3>
+      <p>If a race is cancelled or postponed by the event organizer, we will work with them to secure the best possible outcome for you. This may include a full or partial refund, deferral to the following year, or transfer to another race. Our service fee is non-refundable in these circumstances, but we will refund any recoverable portion of the package. We strongly recommend comprehensive travel insurance that covers event cancellation.</p>
+
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:500;color:#f3efe8;margin:32px 0 16px;">Refund processing</h3>
+      <p>Approved refunds will be processed within 14 business days and returned to the original bank account used for payment. Any bank transfer fees associated with the refund are the responsibility of the recipient. Refund amounts are calculated based on the total package price at the time of booking, excluding any already-consumed services.</p>
+    </div>
+  </section>
+  <Footer />
+</Base>
