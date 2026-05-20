@@ -1,0 +1,46 @@
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">&times;</button>
+    <div class="modal-tag">Express interest</div>
+    <h3 class="modal-title" id="modalRaceName">Race Name</h3>
+    <p class="modal-sub">Be the first to know when entries open.</p>
+    <form id="interestForm">
+      <input type="hidden" name="race_name" id="interestRaceName" />
+      <div class="form-group" style="margin-bottom:14px;">
+        <label class="form-label">Marathon</label>
+        <input type="text" class="form-input" id="modalRaceInput" disabled />
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+        <div class="form-group"><label class="form-label">First name</label><input type="text" class="form-input" name="first_name" required /></div>
+        <div class="form-group"><label class="form-label">Last name</label><input type="text" class="form-input" name="last_name" required /></div>
+      </div>
+      <div class="form-group" style="margin-bottom:14px;"><label class="form-label">Email</label><input type="email" class="form-input" name="email" required /></div>
+      <div class="form-group" style="margin-bottom:14px;"><label class="form-label">Phone</label><input type="tel" class="form-input" name="phone" required /></div>
+      <button type="submit" class="form-submit">Submit interest</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  function openInterest(name: string) {
+    (document.getElementById('modalRaceName') as HTMLElement).textContent = name;
+    (document.getElementById('modalRaceInput') as HTMLInputElement).value = name;
+    (document.getElementById('interestRaceName') as HTMLInputElement).value = name;
+    document.getElementById('modalBackdrop')!.classList.add('active');
+  }
+  function closeModal() { document.getElementById('modalBackdrop')!.classList.remove('active'); }
+  document.getElementById('modalBackdrop')!.addEventListener('click', (e) => {
+    if ((e.target as HTMLElement).id === 'modalBackdrop') closeModal();
+  });
+  document.getElementById('interestForm')!.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target as HTMLFormElement;
+    const data = Object.fromEntries(new FormData(form));
+    const res = await fetch('/api/interest', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+    if (res.ok) {
+      alert("Thank you! We'll be in touch with full package details.");
+      form.reset();
+      closeModal();
+    }
+  });
+</script>

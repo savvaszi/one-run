@@ -1,0 +1,52 @@
+---
+import StatusPill from './StatusPill.astro';
+import { icons } from '../lib/icons';
+
+interface Props {
+  race: {
+    id: string;
+    name: string;
+    city: string;
+    icon: string;
+    date: string;
+    price_from: string;
+    terrain: string;
+    status: string;
+    photos?: string[];
+    included?: string[];
+    desc1?: string;
+    desc2?: string;
+    month?: number;
+  };
+}
+
+const { race } = Astro.props;
+
+const statusCfg: Record<string, { btnLabel: string; btnClass: string }> = {
+  open: { btnLabel: 'Book now', btnClass: '' },
+  soldout: { btnLabel: 'Express interest', btnClass: 'disabled' },
+  express: { btnLabel: 'Register interest', btnClass: 'express-btn' },
+};
+const cfg = statusCfg[race.status] || { btnLabel: 'Express interest', btnClass: 'disabled' };
+const isBookable = race.status === 'open';
+const btnHref = isBookable ? `/races/${race.id}` : '#';
+---
+
+<article class="race-card" data-race-id={race.id}>
+  <div class="race-icon">{@html icons[race.icon] || ''}</div>
+  <div class="race-city">{race.city}</div>
+  <h3 class="race-name">{race.name}</h3>
+  <div class="race-info">
+    <div class="race-info-row"><span class="race-info-label">Date</span><span class="race-info-value">{race.date}</span></div>
+    <div class="race-info-row"><span class="race-info-label">Rate from</span><span class="race-info-value">{race.price_from}</span></div>
+    <div class="race-info-row"><span class="race-info-label">Course</span><span class="race-info-value">{race.terrain}</span></div>
+  </div>
+  <div class="race-status">
+    <StatusPill status={race.status} />
+  </div>
+  {isBookable ? (
+    <a href={btnHref} class={`race-btn ${cfg.btnClass}`}>{cfg.btnLabel}</a>
+  ) : (
+    <button class={`race-btn ${cfg.btnClass}`} onclick={`openInterest('${race.name.replace(/'/g, "\\'")}')`}>{cfg.btnLabel}</button>
+  )}
+</article>

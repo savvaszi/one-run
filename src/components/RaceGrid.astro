@@ -1,0 +1,102 @@
+---
+import RaceCard from './RaceCard.astro';
+
+interface Props {
+  races: any[];
+}
+
+const { races } = Astro.props;
+---
+
+<section class="races" id="races">
+  <div class="section-header">
+    <div>
+      <div class="section-tag">2026 Season</div>
+      <h2 class="section-title">Upcoming <em>races</em></h2>
+    </div>
+  </div>
+
+  <div class="filters">
+    <div class="filter-group">
+      <span class="filter-label">Month</span>
+      <select class="filter-select" id="filterMonth" onchange="applyFilters()">
+        <option value="all">All months</option>
+        <option value="3">March</option><option value="4">April</option>
+        <option value="5">May</option><option value="9">September</option>
+        <option value="10">October</option><option value="11">November</option>
+        <option value="12">December</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">Terrain</span>
+      <select class="filter-select" id="filterTerrain" onchange="applyFilters()">
+        <option value="all">All terrains</option>
+        <option value="Flat & fast">Flat & fast</option>
+        <option value="Hilly">Hilly</option>
+        <option value="Urban">Urban</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">Status</span>
+      <select class="filter-select" id="filterStatus" onchange="applyFilters()">
+        <option value="all">All statuses</option>
+        <option value="open">Open for registration</option>
+        <option value="express">Express interest</option>
+        <option value="soldout">Sold out</option>
+      </select>
+    </div>
+    <button class="filter-reset" onclick="resetFilters()">Reset</button>
+  </div>
+
+  <div class="races-grid">
+    {races.length === 0 ? (
+      <div style="padding:60px 20px;grid-column:1/-1;text-align:center;color:var(--mute);font-size:13px;letter-spacing:1px;">No races match your filters.</div>
+    ) : (
+      races.map((r) => <RaceCard race={r} />)
+    )}
+  </div>
+</section>
+
+<script>
+  const allRaces = JSON.parse(document.getElementById('races-data')?.textContent || '[]');
+
+  function applyFilters() {
+    const m = (document.getElementById('filterMonth') as HTMLSelectElement).value;
+    const t = (document.getElementById('filterTerrain') as HTMLSelectElement).value;
+    const s = (document.getElementById('filterStatus') as HTMLSelectElement).value;
+    const filtered = allRaces.filter((r: any) =>
+      (m === 'all' || r.month === parseInt(m)) &&
+      (t === 'all' || r.terrain === t) &&
+      (s === 'all' || r.status === s)
+    );
+    const grid = document.querySelector('.races-grid')!;
+    if (filtered.length === 0) {
+      grid.innerHTML = `<div style="padding:60px 20px;grid-column:1/-1;text-align:center;color:var(--mute);font-size:13px;letter-spacing:1px;">No races match your filters.</div>`;
+      return;
+    }
+    const cards = filtered.map((r: any) => {
+      const cardEl = document.querySelector(`[data-race-id="${r.id}"]`);
+      return cardEl?.outerHTML || '';
+    }).join('');
+    grid.innerHTML = cards;
+  }
+
+  function resetFilters() {
+    (document.getElementById('filterMonth') as HTMLSelectElement).value = 'all';
+    (document.getElementById('filterTerrain') as HTMLSelectElement).value = 'all';
+    (document.getElementById('filterStatus') as HTMLSelectElement).value = 'all';
+    const grid = document.querySelector('.races-grid')!;
+    const allCards = document.querySelectorAll<HTMLElement>('[data-race-id]');
+    // Need to show all cards - the original grid has them all rendered server-side
+    // So we need to re-query from the races-data JSON and rebuild
+    const data = JSON.parse(document.getElementById('races-data')?.textContent || '[]');
+    // Re-render all cards
+    const container = document.createElement('div');
+    data.forEach((r: any) => {
+      const cardEl = document.querySelector(`[data-race-id="${r.id}"]`);
+      if (cardEl) container.appendChild(cardEl.cloneNode(true));
+    });
+    grid.innerHTML = '';
+    container.childNodes.forEach(c => grid.appendChild(c));
+  }
+</script>

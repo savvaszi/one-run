@@ -1,0 +1,31 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Hero from '../components/Hero.astro';
+import RaceGrid from '../components/RaceGrid.astro';
+import Footer from '../components/Footer.astro';
+import InterestModal from '../components/InterestModal.astro';
+import { db } from '../db/index';
+import { races } from '../db/schema';
+
+const allRaces = await db.select().from(races).all();
+const racesData = allRaces.map(r => ({
+  ...r,
+  photos: JSON.parse(r.photos || '[]'),
+  included: JSON.parse(r.included || '[]'),
+}));
+---
+
+<Base title="One Run — Marathon Travel Experiences">
+  <div id="homepage">
+    <Nav />
+    <section class="hero">
+      <Hero />
+      <div class="hero-runner"><img src="/Runner.jpg" alt="" /></div>
+    </section>
+    <RaceGrid races={racesData} />
+    <Footer />
+  </div>
+  <InterestModal />
+  <script id="races-data" type="application/json">{JSON.stringify(racesData)}</script>
+</Base>
