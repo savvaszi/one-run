@@ -1,0 +1,60 @@
+---
+import Base from '../../layouts/Base.astro';
+import AdminNav from '../../components/AdminNav.astro';
+import { isAdmin } from '../../lib/auth';
+import { getSetting } from '../../lib/settings';
+
+export const prerender = false;
+if (!isAdmin(Astro.cookies)) return Astro.redirect('/admin/login');
+
+const keys = ['revolut_api_key', 'resend_api_key', 'admin_password', 'from_email'];
+const values: Record<string, string> = {};
+for (const k of keys) {
+  const v = await getSetting(k);
+  values[k] = v || '';
+}
+
+function maskValue(key: string, val: string) {
+  if (!val) return '';
+  return (key.includes('api_key') || key.includes('password')) ? '••••••••' : val;
+}
+
+const labels: Record<string, string> = {
+  revolut_api_key: 'Revolut API Key',
+  resend_api_key: 'Resend API Key',
+  admin_password: 'Admin Password',
+  from_email: 'From Email Address',
+};
+---
+
+<Base title="Settings — Admin — One Run">
+  <AdminNav />
+  <section style="padding:120px 48px 80px;max-width:600px;margin:0 auto;">
+    <div class="section-tag">Admin</div>
+    <h2 class="section-title" style="margin-bottom:32px;">Settings</h2>
+
+    <form id="settingsForm" style="background:var(--card);border:1px solid var(--border);padding:28px;">
+      {keys.map(k => (
+        <div class="form-group" style="margin-bottom:16px;">
+          <label class="form-label">{labels[k] || k}</label>
+          <input class="form-input" name={k} placeholder={maskValue(k, values[k]) || 'Not set'} />
+        </div>
+      ))}
+      <button type="submit" class="form-submit">Save settings</button>
+    </form>
+  </section>
+</Base>
+
+<script>
+  document.getElementById('settingsForm')!.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target as HTMLFormElement;
+    const data = Object.fromEntries(new FormData(form));
+    Object.keys(data).forEach(k => { if (!(data[k] as string).trim()) delete data[k]; });
+    const res = await fetch('/api/admin/settings', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data),
+    });
+    if (res.ok) { alert('Settings saved!'); window.location.reload(); }
+    else { alert('Failed to save'); }
+  });
+</script>
