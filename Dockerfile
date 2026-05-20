@@ -18,4 +18,4 @@ COPY start.sh ./
 ENV HOST=0.0.0.0
 ENV PORT=4321
 
-CMD ["sh", "start.sh"]
+CMD ["node", "dist/server/entry.mjs"]
