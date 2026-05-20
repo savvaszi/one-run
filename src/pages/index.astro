@@ -5,15 +5,11 @@ import Hero from '../components/Hero.astro';
 import RaceGrid from '../components/RaceGrid.astro';
 import Footer from '../components/Footer.astro';
 import InterestModal from '../components/InterestModal.astro';
-import { db } from '../db/index';
-import { races } from '../db/schema';
+import { directusGetItems, type DirectusRace } from '../lib/directus';
 
-const allRaces = await db.select().from(races).all();
-const racesData = allRaces.map(r => ({
-  ...r,
-  photos: JSON.parse(r.photos || '[]'),
-  included: JSON.parse(r.included || '[]'),
-}));
+export const prerender = false;
+
+const racesData = await directusGetItems<DirectusRace>('races', { sort: 'sort', limit: -1 });
 ---
 
 <Base title="One Run — Marathon Travel Experiences">
@@ -27,5 +23,5 @@ const racesData = allRaces.map(r => ({
     <Footer />
   </div>
   <InterestModal />
-  <script id="races-data" type="application/json">{JSON.stringify(racesData)}</script>
+  <script id="races-data" type="application/json" set:html={JSON.stringify(racesData)}></script>
 </Base>

@@ -4,26 +4,23 @@ import Nav from '../components/Nav.astro';
 import Logo from '../components/Logo.astro';
 import ProgressBar from '../components/ProgressBar.astro';
 import RunnerForm from '../components/RunnerForm.astro';
-import { db } from '../db/index';
-import { races as racesTable, hotels as hotelsTable } from '../db/schema';
-import { eq } from 'drizzle-orm';
+import { directusGetItem, type DirectusHotel, type DirectusPackage, type DirectusRace } from '../lib/directus';
 
 export const prerender = false;
 
 const url = new URL(Astro.request.url);
-const raceId = url.searchParams.get('race_id');
-const hotelId = url.searchParams.get('hotel_id');
-const packageType = url.searchParams.get('package_type') || 'single';
+const packageId = url.searchParams.get('package_id');
 
-if (!raceId || !hotelId) return Astro.redirect('/');
+if (!packageId) return Astro.redirect('/');
 
-const race = await db.select().from(racesTable).where(eq(racesTable.id, raceId)).get();
-const hotel = await db.select().from(hotelsTable).where(eq(hotelsTable.id, hotelId)).get();
+const selectedPackage = await directusGetItem<DirectusPackage>('packages', packageId);
+const hotel = await directusGetItem<DirectusHotel>('hotels', Number(selectedPackage.hotel));
+const race = await directusGetItem<DirectusRace>('races', Number(hotel.race));
 if (!race || !hotel) return Astro.redirect('/');
 
-const runnerCount = packageType === 'twin' ? 2 : 1;
-const totalPrice = packageType === 'twin' ? hotel.twin_price : hotel.single_price;
-const pkgLabel = packageType === 'single' ? 'Single Room & 1 Race Entry' : 'Twin / Double Room & 2 Race Entries';
+const runnerCount = selectedPackage.runner_count;
+const totalPrice = selectedPackage.price;
+const pkgLabel = selectedPackage.label;
 ---
 
 <Base title={`Book ${race.name} — One Run`}>
@@ -31,7 +28,7 @@ const pkgLabel = packageType === 'single' ? 'Single Room & 1 Race Entry' : 'Twin
 
   <div class="booking-page active">
     <nav>
-      <a href={`/races/${raceId}`} class="detail-back"><span class="detail-back-arrow"></span>Back</a>
+      <a href={`/races/${race.slug}`} class="detail-back"><span class="detail-back-arrow"></span>Back</a>
       <Logo />
       <span></span>
     </nav>
@@ -78,9 +75,7 @@ const pkgLabel = packageType === 'single' ? 'Single Room & 1 Race Entry' : 'Twin
   </div>
 
   <script>
-    const raceId = '{raceId}';
-    const hotelId = '{hotelId}';
-    const packageType = '{packageType}';
+    const packageId = '{packageId}';
     const runnerCount = {runnerCount};
 
     document.getElementById('bookingForm')!.addEventListener('submit', async (e) => {
@@ -109,7 +104,7 @@ const pkgLabel = packageType === 'single' ? 'Single Room & 1 Race Entry' : 'Twin
         const res = await fetch('/api/book', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ race_id: raceId, hotel_id: hotelId, package_type: packageType, runners }),
+          body: JSON.stringify({ package_id: packageId, runners }),
         });
 
         if (!res.ok) {

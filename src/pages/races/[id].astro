@@ -1,31 +1,29 @@
 ---
-import type { GetStaticPaths } from 'astro';
 import Base from '../../layouts/Base.astro';
 import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
 import Logo from '../../components/Logo.astro';
 import IconSVG from '../../components/IconSVG.astro';
 import HotelCardCompact from '../../components/HotelCardCompact.astro';
-import { db } from '../../db/index';
-import { races as racesTable, hotels as hotelsTable } from '../../db/schema';
-import { eq } from 'drizzle-orm';
+import { directusGetItems, type DirectusHotel, type DirectusPackage, type DirectusRace } from '../../lib/directus';
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  const allRaces = await db.select().from(racesTable).all();
-  return allRaces.map(r => ({ params: { id: r.id } }));
-};
+export const prerender = false;
 
 const { id } = Astro.params;
-const race = await db.select().from(racesTable).where(eq(racesTable.id, id!)).get();
+const race = (await directusGetItems<DirectusRace>('races', { 'filter[slug][_eq]': id!, limit: 1 }))[0];
 if (!race) return Astro.redirect('/');
 
-const racePhotos = JSON.parse(race.photos || '[]') as string[];
-const includedItems = JSON.parse(race.included || '[]') as string[];
-const raceHotels = await db.select().from(hotelsTable).where(eq(hotelsTable.race_id, id!)).all();
-const hotelsData = raceHotels.map(h => ({ ...h, features: JSON.parse(h.features || '[]') }));
+const racePhotos = (race as any).photos || [] as string[];
+const includedItems = (race as any).included || [] as string[];
+const raceHotels = await directusGetItems<DirectusHotel>('hotels', { 'filter[race][_eq]': race.id, sort: 'sort', limit: -1 });
+const allPackages = await directusGetItems<DirectusPackage>('packages', { 'filter[hotel][race][_eq]': race.id, limit: -1 });
+const hotelsData = raceHotels.map((hotel) => ({
+  ...hotel,
+  packages: allPackages.filter((pkg: any) => Number(pkg.hotel) === hotel.id),
+}));
 
 const hasHotels = hotelsData.length > 0;
-const anySeats = hotelsData.some((h: any) => (h.total_seats - h.booked_seats) > 0);
+const anySeats = allPackages.some((pkg) => pkg.active && (pkg.total_seats - pkg.booked_seats) > 0);
 const isBookable = race.status === 'open' && hasHotels && anySeats;
 ---
 
@@ -111,7 +109,7 @@ const isBookable = race.status === 'open' && hasHotels && anySeats;
 
   <Footer />
 
-  <script id="hotels-data" type="application/json">{JSON.stringify(hotelsData)}</script>
+  <script id="hotels-data" type="application/json" set:html={JSON.stringify(hotelsData)}></script>
   <script>
     let currentHotel: any = null;
     let currentPackageType: string | null = null;
@@ -124,9 +122,11 @@ const isBookable = race.status === 'open' && hasHotels && anySeats;
       currentHotel = hotelsJson.find((h: any) => h.id === hotelId);
 
       const sel = document.getElementById('occupancySelect') as HTMLSelectElement;
-      sel.innerHTML = `<option value="">Choose room & occupancy&hellip;</option>
-        <option value="single">${currentHotel.name} — Single Room &amp; 1 Race Entry — €${currentHotel.single_price.toLocaleString()}</option>
-        <option value="twin">${currentHotel.name} — Twin / Double Room &amp; 2 Race Entries — €${currentHotel.twin_price.toLocaleString()}</option>`;
+      const options = currentHotel.packages
+        .filter((pkg: any) => pkg.active && (pkg.total_seats - pkg.booked_seats) > 0)
+        .map((pkg: any) => `<option value="${pkg.type}">${currentHotel.name} — ${pkg.label} — €${pkg.price.toLocaleString()}</option>`)
+        .join('');
+      sel.innerHTML = `<option value="">Choose room & occupancy&hellip;</option>${options}`;
       sel.disabled = false;
       sel.value = '';
       currentPackageType = null;
@@ -138,19 +138,18 @@ const isBookable = race.status === 'open' && hasHotels && anySeats;
       const v = (document.getElementById('occupancySelect') as HTMLSelectElement).value;
       if (!v) { currentPackageType = null; (document.getElementById('continueBtn') as HTMLButtonElement).disabled = true; return; }
       currentPackageType = v;
-      const price = v === 'single' ? currentHotel.single_price : currentHotel.twin_price;
-      const roomLabel = v === 'single' ? 'Single Room & 1 Race Entry' : 'Twin / Double Room & 2 Race Entries';
+      const selectedPackage = currentHotel.packages.find((pkg: any) => pkg.type === v);
+      const price = selectedPackage.price;
+      const roomLabel = selectedPackage.label;
       (document.getElementById('continueText') as HTMLElement).innerHTML = `<strong>${currentHotel.name}</strong> &middot; ${roomLabel} — <strong>€${price.toLocaleString()}</strong>`;
       (document.getElementById('continueBtn') as HTMLButtonElement).disabled = false;
     }
 
     function goToBooking() {
       if (!currentHotel) return;
-      const searchParams = new URLSearchParams({
-        race_id: '${race.id}',
-        hotel_id: currentHotel.id,
-        package_type: currentPackageType || 'single'
-      });
+      const selectedPackage = currentHotel.packages.find((pkg: any) => pkg.type === currentPackageType);
+      if (!selectedPackage) return;
+      const searchParams = new URLSearchParams({ package_id: selectedPackage.id });
       window.location.href = `/booking?${searchParams.toString()}`;
     }
 

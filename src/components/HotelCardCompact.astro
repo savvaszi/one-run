@@ -2,7 +2,9 @@
 const { hotel, bookable } = Astro.props;
 const stars = '★'.repeat(hotel.stars);
 const features = (hotel.features as string[]).slice(0, 2).join(' · ');
-const seatsLeft = hotel.total_seats - hotel.booked_seats;
+const activePackages = (hotel.packages || []).filter((pkg: any) => pkg.active);
+const singlePackage = activePackages.find((pkg: any) => pkg.type === 'single');
+const seatsLeft = activePackages.reduce((lowest: number, pkg: any) => Math.min(lowest, pkg.total_seats - pkg.booked_seats), Number.POSITIVE_INFINITY);
 const soldOut = seatsLeft <= 0;
 ---
 
@@ -15,7 +17,7 @@ const soldOut = seatsLeft <= 0;
       <span class="hc-stars">{stars}</span>
     </div>
     <div class="hc-area">{hotel.area}</div>
-    <div class="hc-features">{features} · from €{hotel.single_price.toLocaleString()}</div>
+    <div class="hc-features">{features} · from €{(singlePackage?.price || 0).toLocaleString()}</div>
     {soldOut && <div style="color:var(--red);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;">Sold out</div>}
     {!soldOut && <div style="color:var(--mute);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;">{seatsLeft} seat{seatsLeft !== 1 ? 's' : ''} left</div>}
   </div>

@@ -7,18 +7,22 @@
     "build": "astro build",
     "preview": "astro preview",
     "start": "node dist/server/entry.mjs",
+    "test": "vitest run",
     "db:push": "drizzle-kit push",
-    "db:seed": "tsx src/db/seed.ts"
+    "db:seed": "tsx src/db/seed.ts",
+    "directus:seed": "tsx scripts/seed-directus.ts"
   },
   "dependencies": {
     "@astrojs/node": "^9.2.0",
+    "@libsql/client": "^0.15.0",
     "astro": "^5.7.0",
     "drizzle-orm": "^0.44.0",
-    "@libsql/client": "^0.15.0",
     "resend": "^4.2.0"
   },
   "devDependencies": {
+    "@types/node": "^22.0.0",
     "drizzle-kit": "^0.31.0",
-    "@types/node": "^22.0.0"
+    "tsx": "^4.22.3",
+    "vitest": "^4.1.7"
   }
 }

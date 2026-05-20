@@ -1,0 +1,57 @@
+---
+import Base from '../../layouts/Base.astro';
+
+export const prerender = false;
+
+const { ref } = Astro.params;
+const token = new URL(Astro.request.url).searchParams.get('token') || '';
+---
+
+<Base title={`Cancel booking ${ref} — One Run`}>
+  <div class="booking-body" style="padding-top:120px;">
+    <div class="booking-summary">
+      <div>
+        <div class="summary-race-city">Cancellation</div>
+        <div class="summary-race-name">Booking {ref}</div>
+      </div>
+    </div>
+
+    <form id="cancelForm" class="payment-section">
+      <input type="hidden" name="token" value={token} />
+      <h3>Cancel or request cancellation</h3>
+      <p class="legal-note" style="text-align:left;margin-bottom:20px;">Pending bookings are cancelled immediately. Paid bookings create a cancellation request for admin review.</p>
+      <div class="form-group full" style="margin-bottom:20px;">
+        <label class="form-label optional">Reason</label>
+        <textarea class="form-input form-textarea" name="reason" rows="4" placeholder="Optional cancellation reason"></textarea>
+      </div>
+      <div class="form-group full" style="margin-bottom:20px;">
+        <label class="form-label optional">Email</label>
+        <input class="form-input" type="email" name="requester_email" placeholder="Your email address" />
+      </div>
+      <button class="pay-btn" type="submit">Continue</button>
+      <p id="cancelMessage" class="legal-note"></p>
+    </form>
+  </div>
+
+  <script define:vars={{ ref }}>
+    document.getElementById('cancelForm')!.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const form = event.target as HTMLFormElement;
+      const body = Object.fromEntries(new FormData(form));
+      const res = await fetch(`/api/cancel/${ref}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      const message = document.getElementById('cancelMessage')!;
+      if (!res.ok) {
+        message.textContent = data.error || 'Cancellation failed.';
+        return;
+      }
+      message.textContent = data.status === 'cancelled'
+        ? 'Your booking has been cancelled.'
+        : 'Your cancellation request has been submitted for admin review.';
+    });
+  </script>
+</Base>

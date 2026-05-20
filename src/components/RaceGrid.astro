@@ -54,49 +54,38 @@ const { races } = Astro.props;
     ) : (
       races.map((r) => <RaceCard race={r} />)
     )}
+    <div id="racesEmptyState" style="display:none;padding:60px 20px;grid-column:1/-1;text-align:center;color:var(--mute);font-size:13px;letter-spacing:1px;">No races match your filters.</div>
   </div>
 </section>
 
 <script>
-  const allRaces = JSON.parse(document.getElementById('races-data')?.textContent || '[]');
-
   function applyFilters() {
     const m = (document.getElementById('filterMonth') as HTMLSelectElement).value;
     const t = (document.getElementById('filterTerrain') as HTMLSelectElement).value;
     const s = (document.getElementById('filterStatus') as HTMLSelectElement).value;
-    const filtered = allRaces.filter((r: any) =>
-      (m === 'all' || r.month === parseInt(m)) &&
-      (t === 'all' || r.terrain === t) &&
-      (s === 'all' || r.status === s)
-    );
-    const grid = document.querySelector('.races-grid')!;
-    if (filtered.length === 0) {
-      grid.innerHTML = `<div style="padding:60px 20px;grid-column:1/-1;text-align:center;color:var(--mute);font-size:13px;letter-spacing:1px;">No races match your filters.</div>`;
-      return;
-    }
-    const cards = filtered.map((r: any) => {
-      const cardEl = document.querySelector(`[data-race-id="${r.id}"]`);
-      return cardEl?.outerHTML || '';
-    }).join('');
-    grid.innerHTML = cards;
+
+    const cards = Array.from(document.querySelectorAll<HTMLElement>('[data-race-id]'));
+    let visibleCount = 0;
+
+    cards.forEach((card) => {
+      const visible =
+        (m === 'all' || card.dataset.month === m) &&
+        (t === 'all' || card.dataset.terrain === t) &&
+        (s === 'all' || card.dataset.status === s);
+      card.style.display = visible ? '' : 'none';
+      if (visible) visibleCount += 1;
+    });
+
+    const empty = document.getElementById('racesEmptyState');
+    if (empty) empty.style.display = visibleCount === 0 ? 'block' : 'none';
   }
 
   function resetFilters() {
     (document.getElementById('filterMonth') as HTMLSelectElement).value = 'all';
     (document.getElementById('filterTerrain') as HTMLSelectElement).value = 'all';
     (document.getElementById('filterStatus') as HTMLSelectElement).value = 'all';
-    const grid = document.querySelector('.races-grid')!;
-    const allCards = document.querySelectorAll<HTMLElement>('[data-race-id]');
-    // Need to show all cards - the original grid has them all rendered server-side
-    // So we need to re-query from the races-data JSON and rebuild
-    const data = JSON.parse(document.getElementById('races-data')?.textContent || '[]');
-    // Re-render all cards
-    const container = document.createElement('div');
-    data.forEach((r: any) => {
-      const cardEl = document.querySelector(`[data-race-id="${r.id}"]`);
-      if (cardEl) container.appendChild(cardEl.cloneNode(true));
-    });
-    grid.innerHTML = '';
-    container.childNodes.forEach(c => grid.appendChild(c));
+    document.querySelectorAll<HTMLElement>('[data-race-id]').forEach((card) => card.style.display = '');
+    const empty = document.getElementById('racesEmptyState');
+    if (empty) empty.style.display = 'none';
   }
 </script>

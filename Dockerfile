@@ -3,7 +3,6 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
-RUN npx drizzle-kit push
 RUN npm run build
 
 FROM node:20-slim AS runtime

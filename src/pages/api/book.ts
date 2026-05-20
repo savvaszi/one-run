@@ -1,80 +1,85 @@
 import type { APIRoute } from 'astro';
-import { db } from '../../db/index';
-import { bookings, runners, hotels } from '../../db/schema';
-import { eq } from 'drizzle-orm';
-import { getSetting } from '../../lib/settings';
-import { sendBookingConfirmation } from '../../lib/resend';
+import { directusCreateItem, directusGetItem, directusUpdateItem, type DirectusHotel, type DirectusPackage, type DirectusRace } from '../../lib/directus';
+import { createCancellationToken, hashCancellationToken } from '../../lib/bookingTokens';
+import { sendBookingConfirmationEmail } from '../../lib/bookingEmails';
+
+export const prerender = false;
 
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
-    const { race_id, hotel_id, package_type, runners: runnerData } = body;
+    const { package_id, runners: runnerData } = body;
 
-    if (!race_id || !hotel_id || !package_type || !Array.isArray(runnerData) || runnerData.length === 0) {
+    if (!package_id || !Array.isArray(runnerData) || runnerData.length === 0) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), { status: 400 });
     }
 
-    if (package_type === 'single' && runnerData.length !== 1) {
-      return new Response(JSON.stringify({ error: 'Single package requires 1 runner' }), { status: 400 });
+    const selectedPackage = await directusGetItem<DirectusPackage>('packages', package_id);
+    if (!selectedPackage?.active) throw new Error('Package not available');
+    if (runnerData.length !== selectedPackage.runner_count) {
+      return new Response(JSON.stringify({ error: `${selectedPackage.label} requires ${selectedPackage.runner_count} runner(s)` }), { status: 400 });
     }
-    if (package_type === 'twin' && runnerData.length !== 2) {
-      return new Response(JSON.stringify({ error: 'Twin package requires 2 runners' }), { status: 400 });
+
+    if (selectedPackage.booked_seats + selectedPackage.runner_count > selectedPackage.total_seats) {
+      return new Response(JSON.stringify({ error: 'No seats available for this package' }), { status: 409 });
     }
 
-    const result = await db.transaction(async (tx) => {
-      const hotel = await tx.select().from(hotels).where(eq(hotels.id, hotel_id)).get();
-      if (!hotel) throw new Error('Hotel not found');
+    const hotel = await directusGetItem<DirectusHotel>('hotels', Number(selectedPackage.hotel));
+    const race = await directusGetItem<DirectusRace>('races', Number(hotel.race));
+    const rawToken = createCancellationToken();
+    const tokenHash = await hashCancellationToken(rawToken);
+    const bookingRef = 'ONR-' + Date.now().toString(36).toUpperCase().slice(-6) + '-' + race.slug.slice(0, 3).toUpperCase();
 
-      const needed = package_type === 'twin' ? 2 : 1;
-      if (hotel.booked_seats + needed > hotel.total_seats) {
-        throw new Error('No seats available for this hotel');
-      }
-
-      await tx.update(hotels).set({ booked_seats: hotel.booked_seats + needed }).where(eq(hotels.id, hotel_id));
-
-      const bookingId = 'ONR-' + Date.now().toString(36).toUpperCase().slice(-6) + '-' + race_id.slice(0, 3).toUpperCase();
-      const totalAmount = package_type === 'twin' ? hotel.twin_price : hotel.single_price;
-
-      await tx.insert(bookings).values({
-        id: bookingId,
-        race_id,
-        hotel_id,
-        package_type,
-        total_amount: totalAmount,
-        currency: 'EUR',
-        status: 'pending',
-      });
-
-      for (const r of runnerData) {
-        await tx.insert(runners).values({
-          booking_id: bookingId,
-          full_name: r.full_name,
-          email: r.email,
-          phone: r.phone,
-          nationality: r.nationality,
-          passport_id: r.passport_id,
-          expected_time: r.expected_time,
-          requirements: r.requirements || null,
-        });
-      }
-
-      return { bookingId, totalAmount };
+    await directusUpdateItem('packages', selectedPackage.id, {
+      booked_seats: selectedPackage.booked_seats + selectedPackage.runner_count,
     });
 
-    const apiKey = await getSetting('revolut_api_key');
+    const booking = await directusCreateItem<any>('bookings', {
+      reference: bookingRef,
+      race: race.id,
+      hotel: hotel.id,
+      package: selectedPackage.id,
+      status: 'pending',
+      total_amount: selectedPackage.price,
+      currency: selectedPackage.currency || 'EUR',
+      cancellation_token_hash: tokenHash,
+    });
+
+    for (const r of runnerData) {
+      await directusCreateItem('runners', {
+        booking: booking.id,
+        full_name: r.full_name,
+        email: r.email,
+        phone: r.phone,
+        nationality: r.nationality,
+        passport_id: r.passport_id,
+        expected_time: r.expected_time,
+        requirements: r.requirements || null,
+      });
+    }
+
+    const apiKey = process.env.REVOLUT_API_KEY;
+    const siteUrl = process.env.PUBLIC_SITE_URL || 'https://one-run.net';
+    const cancellationUrl = `${siteUrl}/cancel/${bookingRef}?token=${rawToken}`;
 
     if (!apiKey) {
-      console.log('Revolut not configured — using test mode for booking', result.bookingId);
-      await db.update(bookings).set({
+      console.log('Revolut not configured — using test mode for booking', bookingRef);
+      await directusUpdateItem('bookings', booking.id, {
         status: 'paid',
-        updated_at: new Date().toISOString()
-      }).where(eq(bookings.id, result.bookingId));
+      });
 
-      await sendBookingConfirmation(result.bookingId).catch(e => console.error('Email send failed:', e));
+      await sendBookingConfirmationEmail({
+        bookingRef,
+        raceName: race.name,
+        packageLabel: selectedPackage.label,
+        totalAmount: selectedPackage.price,
+        runnerEmails: runnerData.map((runner: any) => runner.email),
+        cancellationUrl,
+      }).catch(e => console.error('Email send failed:', e));
 
       return new Response(JSON.stringify({
-        booking_id: result.bookingId,
-        redirect_url: `/confirm/${result.bookingId}`
+        booking_id: bookingRef,
+        redirect_url: `/confirm/${bookingRef}`
       }), { status: 200 });
     }
 
@@ -85,12 +90,12 @@ export const POST: APIRoute = async ({ request }) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        amount: result.totalAmount * 100,
+        amount: selectedPackage.price * 100,
         currency: 'EUR',
         capture_mode: 'AUTOMATIC',
-        redirect_url: `https://one-run.net/confirm/${result.bookingId}`,
-        cancel_url: `https://one-run.net/races/${race_id}`,
-        description: `One Run booking ${result.bookingId}`,
+        redirect_url: `${siteUrl}/confirm/${bookingRef}`,
+        cancel_url: `${siteUrl}/races/${race.slug}`,
+        description: `One Run booking ${bookingRef}`,
       }),
     });
 
@@ -100,13 +105,13 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const order = await revolutRes.json() as any;
-    await db.update(bookings).set({
+    await directusUpdateItem('bookings', booking.id, {
       revolut_order_id: order.id
-    }).where(eq(bookings.id, result.bookingId));
+    });
 
     return new Response(JSON.stringify({
-      booking_id: result.bookingId,
-      redirect_url: order.checkout_url || `/confirm/${result.bookingId}`
+      booking_id: bookingRef,
+      redirect_url: order.checkout_url || `/confirm/${bookingRef}`
     }), { status: 200 });
 
   } catch (e: any) {

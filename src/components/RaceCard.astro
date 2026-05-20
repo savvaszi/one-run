@@ -4,7 +4,8 @@ import IconSVG from './IconSVG.astro';
 
 interface Props {
   race: {
-    id: string;
+    id: string | number;
+    slug?: string;
     name: string;
     city: string;
     icon: string;
@@ -21,6 +22,7 @@ interface Props {
 }
 
 const { race } = Astro.props;
+const publicId = race.slug || String(race.id);
 
 const statusCfg: Record<string, { btnLabel: string; btnClass: string }> = {
   open: { btnLabel: 'Book now', btnClass: '' },
@@ -29,11 +31,11 @@ const statusCfg: Record<string, { btnLabel: string; btnClass: string }> = {
 };
 const cfg = statusCfg[race.status] || { btnLabel: 'Express interest', btnClass: 'disabled' };
 const isBookable = race.status === 'open';
-const btnHref = isBookable ? `/races/${race.id}` : '#';
+const btnHref = isBookable ? `/races/${publicId}` : '#';
 const escRaceName = race.name.replace(/'/g, "\\'");
 ---
 
-<article class="race-card" data-race-id={race.id}>
+<article class="race-card" data-race-id={publicId} data-month={race.month} data-terrain={race.terrain} data-status={race.status}>
   <div class="race-icon">
     <IconSVG name={race.icon} />
   </div>

@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
-import { db } from '../../db/index';
-import { interestRegistrations } from '../../db/schema';
+import { directusCreateItem } from '../../lib/directus';
+
+export const prerender = false;
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -11,7 +12,7 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), { status: 400 });
     }
 
-    await db.insert(interestRegistrations).values({
+    await directusCreateItem('interest_registrations', {
       race_name,
       first_name,
       last_name,
