@@ -10,11 +10,13 @@ import { directusGetItems, type DirectusHotel, type DirectusPackage, type Direct
 export const prerender = false;
 
 const { id } = Astro.params;
-const race = (await directusGetItems<DirectusRace>('races', { 'filter[slug][_eq]': id!, limit: 1 }))[0];
+const race = (await directusGetItems<DirectusRace>('races', { 'filter[slug][_eq]': id!, limit: 1, fields: '*,images.directus_files_id' }))[0];
 if (!race) return Astro.redirect('/');
 
 const racePhotos = (race as any).photos || [] as string[];
 const includedItems = (race as any).included || [] as string[];
+const imageIds: number[] = ((race as any).images || []).map((i: any) => i.directus_files_id || (typeof i === 'number' ? i : i.id)).filter(Boolean);
+const raceImages = imageIds.map((fid: number) => ({ url: `https://admin.one-run.net/assets/${fid}` }));
 const raceHotels = await directusGetItems<DirectusHotel>('hotels', { 'filter[race][_eq]': race.id, sort: 'sort', limit: -1 });
 const allPackages = await directusGetItems<DirectusPackage>('packages', { 'filter[hotel][race][_eq]': race.id, limit: -1 });
 const hotelsData = raceHotels.map((hotel) => ({
@@ -64,7 +66,11 @@ const isBookable = race.status === 'open' && hasHotels && anySeats;
           <div class="gallery-photo icon-photo">
             <IconSVG name={race.icon} />
           </div>
-          {racePhotos.map((p: string) => <div class="gallery-photo"><span>{p}</span></div>)}
+          {raceImages.length > 0 ? raceImages.map((img: any) => (
+            <div class="gallery-photo"><img src={img.url} alt="" style="width:100%;height:100%;object-fit:cover;" /></div>
+          )) : racePhotos.map((p: string) => (
+            <div class="gallery-photo"><span>{p}</span></div>
+          ))}
         </div>
       </div>
 
