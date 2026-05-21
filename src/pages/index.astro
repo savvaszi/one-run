@@ -18,7 +18,7 @@ const racesData = await directusGetItems<DirectusRace>('races', { sort: 'sort', 
     <section class="hero">
       <Hero />
       <div class="hero-runner">
-        <video id="heroVideo" autoplay muted loop playsinline poster="/Runner.jpg">
+        <video id="heroVideo" muted playsinline preload="auto" poster="/Runner.jpg">
           <source src="/video/hero.mp4" type="video/mp4" />
         </video>
       </div>
@@ -32,15 +32,27 @@ const racesData = await directusGetItems<DirectusRace>('races', { sort: 'sort', 
     const video = document.getElementById('heroVideo');
     const hero = document.querySelector('.hero');
     if (video && hero) {
+      video.addEventListener('loadedmetadata', () => {
+        video.pause();
+        video.currentTime = 0;
+      });
+
       let ticking = false;
       window.addEventListener('scroll', () => {
         if (!ticking) {
           requestAnimationFrame(() => {
-            const heroBottom = hero.offsetTop + hero.offsetHeight;
-            const scrollPos = window.scrollY;
-            const progress = Math.min(1, Math.max(0, scrollPos / (heroBottom - window.innerHeight * 0.3)));
-            const scale = 1 + progress * 0.35;
-            video.style.transform = `scale(${scale})`;
+            const heroTop = hero.getBoundingClientRect().top;
+            const heroHeight = hero.offsetHeight;
+            const viewHeight = window.innerHeight;
+            const rangeStart = heroTop;
+            const rangeEnd = heroTop + heroHeight - viewHeight * 0.2;
+            const scrollDist = rangeEnd - rangeStart;
+            if (scrollDist > 0) {
+              const progress = Math.min(1, Math.max(0, -heroTop / scrollDist));
+              if (video.duration) {
+                video.currentTime = progress * video.duration;
+              }
+            }
             ticking = false;
           });
           ticking = true;
