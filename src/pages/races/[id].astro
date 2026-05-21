@@ -88,19 +88,19 @@ const isBookable = race.status === 'open' && hasHotels && anySeats;
               <div class="section-tag" style="margin-bottom:6px;">Step 2 — choose room &amp; occupancy</div>
             </div>
             <div class="occupancy-section">
-              <select class="occupancy-select" id="occupancySelect" onchange="selectOccupancy()" disabled>
+              <select class="occupancy-select" id="occupancySelect" disabled>
                 <option value="">Pick a hotel first…</option>
               </select>
             </div>
             <div class="continue-bar-compact">
               <div class="continue-info-compact" id="continueText">No package selected</div>
-              <button class="continue-btn" id="continueBtn" disabled onclick="goToBooking()">Continue &rarr;</button>
+              <button class="continue-btn" id="continueBtn" disabled>Continue &rarr;</button>
             </div>
           </>
         ) : (
           <div class="continue-bar-compact">
             <div class="continue-info-compact">This race is currently not open for booking.</div>
-            <button class="continue-btn" style="width:100%;background:var(--accent);color:var(--bg);" onclick={`openInterest('${(race.name || '').replace(/'/g, "\\'")}')`}>Express interest</button>
+            <button class="continue-btn" style="width:100%;background:var(--accent);color:var(--bg);" id="expressInterestBtn">Express interest</button>
           </div>
         )}
       </div>
@@ -175,6 +175,12 @@ const isBookable = race.status === 'open' && hasHotels && anySeats;
         const hotelId = (this as HTMLElement).dataset.hotelId;
         if (hotelId) selectHotel(this as HTMLElement, hotelId);
       });
+    });
+
+    document.getElementById('occupancySelect')?.addEventListener('change', selectOccupancy);
+    document.getElementById('continueBtn')?.addEventListener('click', goToBooking);
+    document.getElementById('expressInterestBtn')?.addEventListener('click', () => {
+      openInterest(`{race.name}`);
     });
   </script>
 </Base>
