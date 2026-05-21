@@ -119,7 +119,7 @@ const isBookable = race.status === 'open' && hasHotels && anySeats;
     function selectHotel(card: HTMLElement, hotelId: string) {
       document.querySelectorAll('.hotel-card-compact').forEach(c => c.classList.remove('selected'));
       card.classList.add('selected');
-      currentHotel = hotelsJson.find((h: any) => h.id === hotelId);
+      currentHotel = hotelsJson.find((h: any) => h.id === Number(hotelId));
 
       const sel = document.getElementById('occupancySelect') as HTMLSelectElement;
       const options = currentHotel.packages
