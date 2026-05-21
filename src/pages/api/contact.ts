@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { directusCreateItem } from '../../lib/directus';
+import { sendAdminNotificationEmail } from '../../lib/bookingEmails';
 
 export const prerender = false;
 
@@ -19,6 +20,14 @@ export const POST: APIRoute = async ({ request }) => {
       message,
       status: 'new',
     });
+
+    await sendAdminNotificationEmail({
+      bookingRef: `Contact from ${name} <${email}>`,
+      raceName: 'Contact Form',
+      packageLabel: message.substring(0, 100),
+      totalAmount: 0,
+    }).catch(e => console.error('Contact notification email failed:', e));
+
     return new Response(JSON.stringify({ ok: true }), { status: 200 });
   } catch {
     return new Response(JSON.stringify({ error: 'Invalid request' }), { status: 400 });
