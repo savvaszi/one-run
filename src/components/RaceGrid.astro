@@ -19,7 +19,7 @@ const { races } = Astro.props;
   <div class="filters">
     <div class="filter-group">
       <span class="filter-label">Month</span>
-      <select class="filter-select" id="filterMonth" onchange="applyFilters()">
+      <select class="filter-select" id="filterMonth">
         <option value="all">All months</option>
         <option value="3">March</option><option value="4">April</option>
         <option value="5">May</option><option value="9">September</option>
@@ -29,7 +29,7 @@ const { races } = Astro.props;
     </div>
     <div class="filter-group">
       <span class="filter-label">Terrain</span>
-      <select class="filter-select" id="filterTerrain" onchange="applyFilters()">
+      <select class="filter-select" id="filterTerrain">
         <option value="all">All terrains</option>
         <option value="Flat & fast">Flat & fast</option>
         <option value="Hilly">Hilly</option>
@@ -38,14 +38,14 @@ const { races } = Astro.props;
     </div>
     <div class="filter-group">
       <span class="filter-label">Status</span>
-      <select class="filter-select" id="filterStatus" onchange="applyFilters()">
+      <select class="filter-select" id="filterStatus">
         <option value="all">All statuses</option>
         <option value="open">Open for registration</option>
         <option value="express">Express interest</option>
         <option value="soldout">Sold out</option>
       </select>
     </div>
-    <button class="filter-reset" onclick="resetFilters()">Reset</button>
+    <button class="filter-reset" id="filterReset">Reset</button>
   </div>
 
   <div class="races-grid">
@@ -88,4 +88,9 @@ const { races } = Astro.props;
     const empty = document.getElementById('racesEmptyState');
     if (empty) empty.style.display = 'none';
   }
+
+  document.getElementById('filterMonth')?.addEventListener('change', applyFilters);
+  document.getElementById('filterTerrain')?.addEventListener('change', applyFilters);
+  document.getElementById('filterStatus')?.addEventListener('change', applyFilters);
+  document.getElementById('filterReset')?.addEventListener('click', resetFilters);
 </script>

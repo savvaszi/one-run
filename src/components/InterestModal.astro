@@ -1,6 +1,6 @@
 <div class="modal-backdrop" id="modalBackdrop">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal()">&times;</button>
+    <button class="modal-close" id="modalClose">&times;</button>
     <div class="modal-tag">Express interest</div>
     <h3 class="modal-title" id="modalRaceName">Race Name</h3>
     <p class="modal-sub">Be the first to know when entries open.</p>
@@ -41,6 +41,14 @@
       alert("Thank you! We'll be in touch with full package details.");
       form.reset();
       closeModal();
+    }
+  });
+  document.getElementById('modalClose')?.addEventListener('click', closeModal);
+  document.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest('[data-race-name]');
+    if (btn) {
+      const name = (btn as HTMLElement).dataset.raceName;
+      if (name) openInterest(name);
     }
   });
 </script>

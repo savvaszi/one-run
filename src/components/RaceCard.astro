@@ -52,6 +52,6 @@ const escRaceName = race.name.replace(/'/g, "\\'");
   {isBookable ? (
     <a href={btnHref} class="race-btn">{cfg.btnLabel}</a>
   ) : (
-    <button class={`race-btn ${cfg.btnClass}`} onclick={`openInterest('${escRaceName}')`}>{cfg.btnLabel}</button>
+    <button class={`race-btn ${cfg.btnClass}`} data-race-name={race.name}>{cfg.btnLabel}</button>
   )}
 </article>
