@@ -7,7 +7,7 @@ export const prerender = false;
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
-    const { race_name, first_name, last_name, email, phone } = body;
+    const { race_name, first_name, last_name, email, phone, message } = body;
 
     if (!race_name || !first_name || !last_name || !email) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), { status: 400 });
@@ -19,6 +19,7 @@ export const POST: APIRoute = async ({ request }) => {
       last_name,
       email,
       phone: phone || '',
+      message: message || null,
     });
 
     await sendInterestAcknowledgement(email, race_name).catch(e => console.error('Interest email failed:', e));
