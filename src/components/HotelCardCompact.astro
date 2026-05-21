@@ -10,7 +10,9 @@ const soldOut = seatsLeft <= 0;
 
 <article class={`hotel-card-compact${soldOut || !bookable ? '' : ''}`} data-hotel-id={hotel.id}>
   {hotel.website && <a href={hotel.website} target="_blank" rel="noopener noreferrer" class="hc-website-link" onclick="event.stopPropagation()">Visit ↗</a>}
-  <div class="hc-photo"><span>{hotel.name}</span></div>
+  <div class="hc-photo">
+    {hotel.photo ? <img src={`https://admin.one-run.net/assets/${hotel.photo}`} alt={hotel.name} style="width:100%;height:100%;object-fit:cover;" /> : <span>{hotel.name}</span>}
+  </div>
   <div class="hc-content">
     <div class="hc-name-row">
       <span class="hc-name">{hotel.name}</span>
