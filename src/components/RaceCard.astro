@@ -26,7 +26,7 @@ const publicId = race.slug || String(race.id);
 
 const statusCfg: Record<string, { btnLabel: string; btnClass: string }> = {
   open: { btnLabel: 'Book now', btnClass: '' },
-  soldout: { btnLabel: 'Express interest', btnClass: 'disabled' },
+  soldout: { btnLabel: 'Express interest', btnClass: 'express-btn' },
   express: { btnLabel: 'Register interest', btnClass: 'express-btn' },
 };
 const cfg = statusCfg[race.status] || { btnLabel: 'Express interest', btnClass: 'disabled' };
