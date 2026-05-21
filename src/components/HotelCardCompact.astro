@@ -1,7 +1,9 @@
 ---
+import { displayChars } from '../lib/display';
+
 const { hotel, bookable } = Astro.props;
-const stars = '★'.repeat(hotel.stars);
-const features = (hotel.features as string[]).slice(0, 2).join(' · ');
+const starsHtml = Array.from({ length: hotel.stars }, () => '<span class="star">&#9733;</span>').join('');
+const features = (hotel.features as string[]).slice(0, 2).join(' | ');
 const activePackages = (hotel.packages || []).filter((pkg: any) => pkg.active);
 const singlePackage = activePackages.find((pkg: any) => pkg.type === 'single');
 const seatsLeft = activePackages.reduce((lowest: number, pkg: any) => Math.min(lowest, pkg.total_seats - pkg.booked_seats), Number.POSITIVE_INFINITY);
@@ -9,15 +11,15 @@ const soldOut = seatsLeft <= 0;
 ---
 
 <article class={`hotel-card-compact${soldOut || !bookable ? '' : ''}`} data-hotel-id={hotel.id}>
-  {hotel.website && <a href={hotel.website} target="_blank" rel="noopener noreferrer" class="hc-website-link" onclick="event.stopPropagation()">Visit ↗</a>}
+  {hotel.website && <a href={hotel.website} target="_blank" rel="noopener noreferrer" class="hc-website-link" onclick="event.stopPropagation()">Visit &#8599;</a>}
   <div class="hc-photo"><span>{hotel.name}</span></div>
   <div class="hc-content">
     <div class="hc-name-row">
       <span class="hc-name">{hotel.name}</span>
-      <span class="hc-stars">{stars}</span>
+      <span class="hc-stars" set:html={starsHtml}></span>
     </div>
-    <div class="hc-area">{hotel.area}</div>
-    <div class="hc-features">{features} · from €{(singlePackage?.price || 0).toLocaleString()}</div>
+    <div class="hc-area">{displayChars(hotel.area)}</div>
+    <div class="hc-features">{displayChars(features)} &middot; from &euro;{(singlePackage?.price || 0).toLocaleString()}</div>
     {soldOut && <div style="color:var(--red);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;">Sold out</div>}
     {!soldOut && <div style="color:var(--mute);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;">{seatsLeft} seat{seatsLeft !== 1 ? 's' : ''} left</div>}
   </div>

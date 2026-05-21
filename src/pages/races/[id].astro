@@ -6,6 +6,7 @@ import Logo from '../../components/Logo.astro';
 import IconSVG from '../../components/IconSVG.astro';
 import HotelCardCompact from '../../components/HotelCardCompact.astro';
 import { directusGetItems, type DirectusHotel, type DirectusPackage, type DirectusRace } from '../../lib/directus';
+import { displayChars } from '../../lib/display';
 
 export const prerender = false;
 
@@ -19,6 +20,7 @@ const raceHotels = await directusGetItems<DirectusHotel>('hotels', { 'filter[rac
 const allPackages = await directusGetItems<DirectusPackage>('packages', { 'filter[hotel][race][_eq]': race.id, limit: -1 });
 const hotelsData = raceHotels.map((hotel) => ({
   ...hotel,
+  area: displayChars(hotel.area),
   packages: allPackages.filter((pkg: any) => Number(pkg.hotel) === hotel.id),
 }));
 
@@ -47,7 +49,7 @@ const isBookable = race.status === 'open' && hasHotels && anySeats;
           <div class="meta-item"><div class="meta-l">Date</div><div class="meta-v">{race.date}</div></div>
           <div class="meta-item"><div class="meta-l">Distance</div><div class="meta-v">42.195 km</div></div>
           <div class="meta-item"><div class="meta-l">Terrain</div><div class="meta-v">{race.terrain}</div></div>
-          <div class="meta-item"><div class="meta-l">From</div><div class="meta-v">{race.price_from}</div></div>
+          <div class="meta-item"><div class="meta-l">From</div><div class="meta-v">{displayChars(race.price_from)}</div></div>
         </div>
 
         <div class="detail-info-row">
@@ -124,7 +126,7 @@ const isBookable = race.status === 'open' && hasHotels && anySeats;
       const sel = document.getElementById('occupancySelect') as HTMLSelectElement;
       const options = currentHotel.packages
         .filter((pkg: any) => pkg.active && (pkg.total_seats - pkg.booked_seats) > 0)
-        .map((pkg: any) => `<option value="${pkg.type}">${currentHotel.name} — ${pkg.label} — €${pkg.price.toLocaleString()}</option>`)
+        .map((pkg: any) => `<option value="${pkg.type}">${currentHotel.name} &mdash; ${pkg.label} &mdash; &euro;${pkg.price.toLocaleString()}</option>`)
         .join('');
       sel.innerHTML = `<option value="">Choose room & occupancy&hellip;</option>${options}`;
       sel.disabled = false;
@@ -141,7 +143,7 @@ const isBookable = race.status === 'open' && hasHotels && anySeats;
       const selectedPackage = currentHotel.packages.find((pkg: any) => pkg.type === v);
       const price = selectedPackage.price;
       const roomLabel = selectedPackage.label;
-      (document.getElementById('continueText') as HTMLElement).innerHTML = `<strong>${currentHotel.name}</strong> &middot; ${roomLabel} — <strong>€${price.toLocaleString()}</strong>`;
+      (document.getElementById('continueText') as HTMLElement).innerHTML = `<strong>${currentHotel.name}</strong> &middot; ${roomLabel} &mdash; <strong>&euro;${price.toLocaleString()}</strong>`;
       (document.getElementById('continueBtn') as HTMLButtonElement).disabled = false;
     }
 
