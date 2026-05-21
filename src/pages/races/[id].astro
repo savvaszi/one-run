@@ -27,7 +27,7 @@ const anySeats = allPackages.some((pkg) => pkg.active && (pkg.total_seats - pkg.
 const isBookable = race.status === 'open' && hasHotels && anySeats;
 ---
 
-<Base title={`${race.name} — One Run`}>
+  <Base title={`${race.name} — One Run Travel Packages`}>
   <Nav />
 
   <div class="detail-page active" id="detailPage">
