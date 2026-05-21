@@ -16,7 +16,7 @@ const soldOut = seatsLeft <= 0;
       <span class="hc-name">{hotel.name}</span>
       <span class="hc-stars">{stars}</span>
     </div>
-    <div class="hc-area">{hotel.area}</div>
+    <div class="hc-area">{hotel.area.replace(/\|/g, '\u00B7').replace(/\*/g, '\u2605')}</div>
     <div class="hc-features">{features} · from €{(singlePackage?.price || 0).toLocaleString()}</div>
     {soldOut && <div style="color:var(--red);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;">Sold out</div>}
     {!soldOut && <div style="color:var(--mute);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;">{seatsLeft} seat{seatsLeft !== 1 ? 's' : ''} left</div>}

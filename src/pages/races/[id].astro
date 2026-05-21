@@ -47,7 +47,7 @@ const isBookable = race.status === 'open' && hasHotels && anySeats;
           <div class="meta-item"><div class="meta-l">Date</div><div class="meta-v">{race.date}</div></div>
           <div class="meta-item"><div class="meta-l">Distance</div><div class="meta-v">42.195 km</div></div>
           <div class="meta-item"><div class="meta-l">Terrain</div><div class="meta-v">{race.terrain}</div></div>
-          <div class="meta-item"><div class="meta-l">From</div><div class="meta-v">{race.price_from}</div></div>
+          <div class="meta-item"><div class="meta-l">From</div><div class="meta-v">{race.price_from.replace(/^EUR /, '\u20AC')}</div></div>
         </div>
 
         <div class="detail-info-row">

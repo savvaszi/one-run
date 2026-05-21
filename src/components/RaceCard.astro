@@ -43,7 +43,7 @@ const escRaceName = race.name.replace(/'/g, "\\'");
   <h3 class="race-name">{race.name}</h3>
   <div class="race-info">
     <div class="race-info-row"><span class="race-info-label">Date</span><span class="race-info-value">{race.date}</span></div>
-    <div class="race-info-row"><span class="race-info-label">Rate from</span><span class="race-info-value">{race.price_from}</span></div>
+    <div class="race-info-row"><span class="race-info-label">Rate from</span><span class="race-info-value">{race.price_from.replace(/^EUR /, '\u20AC')}</span></div>
     <div class="race-info-row"><span class="race-info-label">Course</span><span class="race-info-value">{race.terrain}</span></div>
   </div>
   <div class="race-status">
