@@ -3,8 +3,7 @@ import { displayChars } from '../lib/display';
 
 const { hotel, bookable } = Astro.props;
 const starsHtml = Array.from({ length: hotel.stars }, () => '<span class="star">&#9733;</span>').join('');
-const featuresJoined = (hotel.features as string[]).slice(0, 2).join(' | ');
-const featuresHtml = displayChars(featuresJoined) + ' &middot; from &euro;' + (singlePackage?.price || 0).toLocaleString();
+const featuresHtml = displayChars(features) + ' &middot; from &euro;' + (singlePackage?.price || 0).toLocaleString();
 const activePackages = (hotel.packages || []).filter((pkg: any) => pkg.active);
 const singlePackage = activePackages.find((pkg: any) => pkg.type === 'single');
 const seatsLeft = activePackages.reduce((lowest: number, pkg: any) => Math.min(lowest, pkg.total_seats - pkg.booked_seats), Number.POSITIVE_INFINITY);
