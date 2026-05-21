@@ -8,6 +8,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:22px 48px;display:fl
 .logo{position:relative;line-height:1;cursor:pointer}
 .logo-one{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:36px;letter-spacing:-1px;color:var(--fg)}
 .logo-run{font-family:'Cormorant Garamond',serif;font-weight:400;font-size:22px;color:rgba(243,239,232,0.55);position:absolute;left:42px;top:28px}
+.logo-sub{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(243,239,232,0.3);position:absolute;left:42px;top:52px}
 .nav-links{display:flex;gap:36px;list-style:none}
 .nav-links a{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:rgba(243,239,232,0.55);transition:color 0.3s}
 .nav-links a:hover{color:var(--accent)}
