@@ -90,7 +90,10 @@ export const POST: APIRoute = async ({ request }) => {
       }), { status: 200 });
     }
 
-    const revolutRes = await fetch('https://merchant.revolut.com/api/1.0/orders', {
+    const revolutBase = process.env.REVOLUT_API_URL || (
+      apiKey.startsWith('sand_') ? 'https://sandbox-merchant.revolut.com' : 'https://merchant.revolut.com'
+    );
+    const revolutRes = await fetch(`${revolutBase}/api/1.0/orders`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
