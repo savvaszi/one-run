@@ -60,17 +60,20 @@
   }
 
   .maintenance-content .logo {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
     margin-bottom: 48px;
-    position: static;
     cursor: default;
+    line-height: 1;
   }
 
   .maintenance-content .logo-sub {
-    position: static;
+    display: block;
+    width: 100%;
     margin-top: 4px;
+    text-align: center;
   }
 
   .maintenance-motto {
