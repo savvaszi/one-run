@@ -5,23 +5,34 @@ import Hero from '../components/Hero.astro';
 import RaceGrid from '../components/RaceGrid.astro';
 import Footer from '../components/Footer.astro';
 import InterestModal from '../components/InterestModal.astro';
+import MaintenancePage from '../components/MaintenancePage.astro';
 import { directusGetItems, type DirectusRace } from '../lib/directus';
 
 export const prerender = false;
 
-const racesData = await directusGetItems<DirectusRace>('races', { sort: 'sort', limit: -1 });
+const maintenance = process.env.MAINTENANCE_MODE === 'true';
+
+if (!maintenance) {
+  var racesData = await directusGetItems<DirectusRace>('races', { sort: 'sort', limit: -1 });
+}
 ---
 
-<Base title="One Run Travel Packages — Marathon Travel Experiences">
-  <div id="homepage">
-    <Nav />
-    <section class="hero">
-      <Hero />
-      <div class="hero-runner"><img src="/Runner1.jpg" alt="" /></div>
-    </section>
-    <RaceGrid races={racesData} />
-    <Footer />
-  </div>
-  <InterestModal />
-  <script id="races-data" type="application/json" set:html={JSON.stringify(racesData)}></script>
-</Base>
+{maintenance ? (
+  <Base title="One Run Travel Packages — Coming Soon" description="Which race is your next one? We will be live soon.">
+    <MaintenancePage />
+  </Base>
+) : (
+  <Base title="One Run Travel Packages — Marathon Travel Experiences">
+    <div id="homepage">
+      <Nav />
+      <section class="hero">
+        <Hero />
+        <div class="hero-runner"><img src="/Runner1.jpg" alt="" /></div>
+      </section>
+      <RaceGrid races={racesData} />
+      <Footer />
+    </div>
+    <InterestModal />
+    <script id="races-data" type="application/json" set:html={JSON.stringify(racesData)}></script>
+  </Base>
+)}
