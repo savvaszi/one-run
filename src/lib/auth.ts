@@ -5,10 +5,7 @@ const COOKIE_NAME = 'onerun_admin';
 
 export async function verifyPassword(password: string): Promise<boolean> {
   const stored = await getSetting('admin_password');
-  if (!stored) {
-    return password === 'onerun2026';
-  }
-  return password === stored;
+  return Boolean(stored) && password === stored;
 }
 
 export function isAdmin(cookies: AstroCookies): boolean {
@@ -20,6 +17,7 @@ export function setAdminCookie(cookies: AstroCookies): void {
     path: '/',
     httpOnly: true,
     sameSite: 'lax',
+    secure: import.meta.env.PROD,
     maxAge: 60 * 60 * 24,
   });
 }

@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { verifyRevolutWebhook } from '../../../lib/revolutWebhook';
 import { directusGetItem, directusGetItems, directusUpdateItem, type DirectusBooking, type DirectusPackage, type DirectusRace, type DirectusRunner } from '../../../lib/directus';
 import { sendAdminNotificationEmail, sendBookingConfirmationEmail } from '../../../lib/bookingEmails';
 
@@ -6,7 +7,16 @@ export const prerender = false;
 
 export const POST: APIRoute = async ({ request }) => {
   try {
-    const body = await request.json();
+    const rawBody = await request.text();
+    const verified = verifyRevolutWebhook(
+      rawBody,
+      request.headers.get('Revolut-Request-Timestamp'),
+      request.headers.get('Revolut-Signature'),
+      process.env.REVOLUT_WEBHOOK_SECRET,
+    );
+    if (!verified) return new Response('Unauthorized', { status: 401 });
+
+    const body = JSON.parse(rawBody);
     const { event, order_id } = body;
 
     if (event !== 'ORDER_COMPLETED') {
@@ -52,6 +62,6 @@ export const POST: APIRoute = async ({ request }) => {
     return new Response('OK', { status: 200 });
   } catch (e) {
     console.error('Webhook error:', e);
-    return new Response('OK', { status: 200 });
+    return new Response('Invalid webhook', { status: 400 });
   }
 };

@@ -10,8 +10,13 @@ export const POST: APIRoute = async ({ request }) => {
     const body = await request.json();
     const { package_id, runners: runnerData } = body;
 
-    if (!package_id || !Array.isArray(runnerData) || runnerData.length === 0) {
+    if (!Number.isInteger(Number(package_id)) || Number(package_id) <= 0 || !Array.isArray(runnerData) || runnerData.length === 0) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), { status: 400 });
+    }
+
+    const requiredRunnerFields = ['full_name', 'email', 'phone', 'nationality', 'passport_id', 'expected_time'];
+    if (runnerData.some((runner: any) => requiredRunnerFields.some((field) => typeof runner?.[field] !== 'string' || !runner[field].trim()))) {
+      return new Response(JSON.stringify({ error: 'Incomplete runner details' }), { status: 400 });
     }
 
     const selectedPackage = await directusGetItem<DirectusPackage>('packages', package_id);
@@ -26,6 +31,12 @@ export const POST: APIRoute = async ({ request }) => {
 
     const hotel = await directusGetItem<DirectusHotel>('hotels', Number(selectedPackage.hotel));
     const race = await directusGetItem<DirectusRace>('races', Number(hotel.race));
+    const apiKey = process.env.REVOLUT_API_KEY;
+    const allowTestBookings = process.env.ALLOW_TEST_BOOKINGS === 'true';
+    if (!apiKey && !allowTestBookings) {
+      return new Response(JSON.stringify({ error: 'Payment service is not configured' }), { status: 503 });
+    }
+
     const rawToken = createCancellationToken();
     const tokenHash = await hashCancellationToken(rawToken);
     const bookingRef = 'ONR-' + Date.now().toString(36).toUpperCase().slice(-6) + '-' + race.slug.slice(0, 3).toUpperCase();
@@ -58,7 +69,6 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    const apiKey = process.env.REVOLUT_API_KEY;
     const siteUrl = process.env.PUBLIC_SITE_URL || 'https://one-run.net';
     const cancellationUrl = `${siteUrl}/cancel/${bookingRef}?token=${rawToken}`;
 
